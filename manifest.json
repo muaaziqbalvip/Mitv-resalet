@@ -1,0 +1,21 @@
+{
+  "name": "MITV Reseller Portal",
+  "short_name": "MITV",
+  "description": "MiTV Network Reseller Management Portal by MUSLIM ISLAM",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#080c14",
+  "theme_color": "#f0b429",
+  "icons": [
+    {
+      "src": "https://mitvnet.vercel.app/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://mitvnet.vercel.app/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
