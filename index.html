@@ -8,17 +8,6 @@
   <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#f0b429">
 <link rel="apple-touch-icon" href="https://mitvnet.vercel.app/logo.png">
-
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('MITV PWA Active!'))
-        .catch(err => console.log('PWA Error', err));
-    });
-  }
-</script>
-
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;800&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -343,6 +332,13 @@
 
 <!-- Firebase SDK -->
 <script type="module">
+   if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('MITV PWA Active!'))
+        .catch(err => console.log('PWA Error', err));
+    });
+  }
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
   import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
 
