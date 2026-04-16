@@ -2,413 +2,385 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MITV Network — Reseller Portal</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="manifest" href="manifest.json">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#f0b429">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MITV Portal">
+<title>MITV Network — Reseller Portal</title>
+<link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png">
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/shared.css">
 <style>
-  :root {
-    --gold: #f0b429;
-    --gold2: #ffd166;
-    --dark: #080c14;
-    --dark2: #0d1420;
-    --dark3: #111928;
-    --panel: #0f1923;
-    --panel2: #162030;
-    --border: rgba(240,180,41,0.18);
-    --border2: rgba(240,180,41,0.35);
-    --text: #e8edf5;
-    --text2: #8fa3b8;
-    --green: #00e676;
-    --red: #ff4d6d;
-    --blue: #4fc3f7;
-    --glow: 0 0 24px rgba(240,180,41,0.22);
-    --glow2: 0 0 48px rgba(240,180,41,0.13);
-  }
+/* ── PAGE SPECIFIC ─────────────────────────────────────────── */
+.login-page {
+  position: relative; z-index: 1;
+  min-height: 100vh; min-height: 100dvh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 1.5rem;
+}
 
-  * { margin:0; padding:0; box-sizing:border-box; }
+/* Logo 3D */
+.logo-area {
+  text-align: center; margin-bottom: 2rem;
+  animation: fadeInDown 0.7s ease both;
+  perspective: 600px;
+}
+.logo-img-wrap {
+  width: 90px; height: 90px; margin: 0 auto 1rem;
+  perspective: 400px;
+  animation: logoFloat 4s ease-in-out infinite;
+}
+.logo-img-wrap img {
+  width: 100%; height: 100%; object-fit: contain;
+  filter: drop-shadow(0 0 24px rgba(240,180,41,0.7));
+  animation: logoRotate 8s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+@keyframes logoFloat  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+@keyframes logoRotate { 0%,100%{transform:rotateY(0) scale(1)} 50%{transform:rotateY(15deg) scale(1.05)} }
 
-  body {
-    background: var(--dark);
-    color: var(--text);
-    font-family: 'Exo 2', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+.logo-title {
+  font-family: var(--font-head); font-size: 2rem; font-weight: 900;
+  letter-spacing: 5px; text-transform: uppercase;
+  background: linear-gradient(90deg, var(--gold3), var(--gold2), var(--gold), var(--gold2));
+  background-size: 200%;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  animation: shimmer 3s linear infinite;
+}
+.logo-sub {
+  color: var(--text2); font-size: 0.72rem; letter-spacing: 3px;
+  text-transform: uppercase; margin-top: 0.3rem;
+}
+@keyframes shimmer { 0%{background-position:0%} 100%{background-position:200%} }
 
-  /* Animated background grid */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background:
-      linear-gradient(rgba(240,180,41,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(240,180,41,0.03) 1px, transparent 1px);
-    background-size: 48px 48px;
-    animation: gridPan 30s linear infinite;
-    pointer-events: none;
-    z-index: 0;
-  }
-  @keyframes gridPan { 0%{background-position:0 0} 100%{background-position:48px 48px} }
+/* Tab switcher */
+.tab-row {
+  display: flex; background: var(--dark2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 4px; margin-bottom: 1.4rem; gap: 2px;
+}
+.tab-btn {
+  flex: 1; padding: 0.65rem; border: none; border-radius: 9px;
+  font-family: var(--font-head); font-size: 0.72rem; letter-spacing: 1.5px;
+  cursor: pointer; transition: var(--transition); color: var(--text2); background: transparent;
+}
+.tab-btn.active {
+  background: linear-gradient(135deg, var(--gold), var(--gold3)); color: var(--dark); font-weight: 700;
+  box-shadow: 0 2px 10px rgba(240,180,41,0.3);
+}
 
-  /* Radial glow center */
-  body::after {
-    content: '';
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%,-50%);
-    width: 900px;
-    height: 900px;
-    background: radial-gradient(circle, rgba(240,180,41,0.07) 0%, transparent 65%);
-    pointer-events: none;
-    z-index: 0;
-  }
+/* Cards */
+.auth-card {
+  width: 100%; max-width: 420px;
+  animation: scaleIn 0.5s 0.1s cubic-bezier(0.34,1.56,0.64,1) both;
+}
 
-  .login-wrap {
-    position: relative;
-    z-index: 1;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-  }
+/* Field with icon */
+.field-wrap { position: relative; margin-bottom: 1.1rem; }
+.field-icon { position:absolute; left:1rem; top:50%; transform:translateY(-50%); font-size:1rem; color:var(--text2); pointer-events:none; transition:color 0.2s; }
+.form-input { padding-left: 2.9rem !important; }
+.field-wrap:focus-within .field-icon { color: var(--gold); }
+.field-label { font-family:var(--font-head); font-size:0.68rem; letter-spacing:2px; color:var(--text2); display:block; margin-bottom:0.4rem; text-transform:uppercase; }
 
-  .logo-area {
-    text-align: center;
-    margin-bottom: 2.4rem;
-    animation: fadeDown 0.7s ease both;
-  }
+/* Error */
+.error-box {
+  background: rgba(255,77,109,0.1); border: 1px solid rgba(255,77,109,0.3);
+  border-radius: var(--radius-sm); padding: 0.7rem 1rem; color: var(--red);
+  font-size: 0.82rem; margin-bottom: 0.9rem; display: none;
+}
+.error-box.show { display: block; animation: shake 0.4s ease; }
 
-  .logo-icon {
-    width: 72px; height: 72px;
-    background: linear-gradient(135deg, var(--gold), #c88400);
-    border-radius: 20px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 2rem;
-    margin: 0 auto 1rem;
-    box-shadow: var(--glow), 0 8px 32px rgba(0,0,0,0.5);
-    position: relative;
-    overflow: hidden;
-  }
-  .logo-icon::after {
-    content: '';
-    position: absolute;
-    top: -40%;
-    left: -40%;
-    width: 60%;
-    height: 60%;
-    background: rgba(255,255,255,0.2);
-    border-radius: 50%;
-    filter: blur(12px);
-  }
+/* Success box */
+.success-box {
+  background: rgba(0,230,118,0.1); border: 1px solid rgba(0,230,118,0.25);
+  border-radius: var(--radius-sm); padding: 0.8rem 1rem; color: var(--green);
+  font-size: 0.85rem; margin-bottom: 0.9rem; display: none; line-height: 1.6;
+}
+.success-box.show { display: block; animation: fadeIn 0.4s ease; }
 
-  .logo-title {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 2.4rem;
-    font-weight: 700;
-    letter-spacing: 4px;
-    background: linear-gradient(90deg, var(--gold), var(--gold2), var(--gold));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-transform: uppercase;
-  }
-  .logo-sub {
-    color: var(--text2);
-    font-size: 0.78rem;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    margin-top: 0.3rem;
-  }
+/* Footer */
+.login-footer {
+  margin-top: 1.8rem; text-align: center; color: var(--text2);
+  font-size: 0.72rem; letter-spacing: 1px;
+  animation: fadeInUp 0.6s 0.3s ease both;
+}
+.login-footer .gold { color: var(--gold); }
 
-  .login-card {
-    background: var(--panel);
-    border: 1px solid var(--border2);
-    border-radius: 20px;
-    padding: 2.4rem 2.6rem;
-    width: 100%;
-    max-width: 420px;
-    box-shadow: 0 24px 80px rgba(0,0,0,0.6), var(--glow2);
-    animation: fadeUp 0.7s 0.15s ease both;
-    position: relative;
-    overflow: hidden;
-  }
-  .login-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  }
+/* PWA banner */
+#pwaBanner { z-index: 500; }
 
-  .card-title {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 1.25rem;
-    font-weight: 600;
-    letter-spacing: 2px;
-    color: var(--gold);
-    text-transform: uppercase;
-    margin-bottom: 0.3rem;
-  }
-  .card-sub { color: var(--text2); font-size: 0.82rem; margin-bottom: 1.8rem; }
-
-  .field-label {
-    font-size: 0.72rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--text2);
-    margin-bottom: 0.45rem;
-    display: block;
-  }
-  .field-wrap { margin-bottom: 1.2rem; position: relative; }
-
-  .field-input {
-    width: 100%;
-    background: var(--dark2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 0.85rem 1rem 0.85rem 2.8rem;
-    color: var(--text);
-    font-family: 'Exo 2', sans-serif;
-    font-size: 0.95rem;
-    outline: none;
-    transition: border-color 0.25s, box-shadow 0.25s;
-  }
-  .field-input:focus {
-    border-color: var(--gold);
-    box-shadow: 0 0 0 3px rgba(240,180,41,0.12);
-  }
-  .field-icon {
-    position: absolute;
-    left: 0.9rem;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1rem;
-    color: var(--text2);
-    pointer-events: none;
-  }
-
-  .btn-login {
-    width: 100%;
-    padding: 0.95rem;
-    background: linear-gradient(135deg, var(--gold), #c88400);
-    border: none;
-    border-radius: 10px;
-    color: #080c14;
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 1.05rem;
-    font-weight: 700;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.25s;
-    margin-top: 0.5rem;
-    position: relative;
-    overflow: hidden;
-  }
-  .btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(240,180,41,0.35); }
-  .btn-login:active { transform: translateY(0); }
-  .btn-login .btn-shine {
-    position: absolute;
-    top: 0; left: -100%;
-    width: 60%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
-    transition: left 0.4s;
-  }
-  .btn-login:hover .btn-shine { left: 150%; }
-
-  .error-msg {
-    background: rgba(255,77,109,0.12);
-    border: 1px solid rgba(255,77,109,0.3);
-    border-radius: 8px;
-    padding: 0.7rem 1rem;
-    color: var(--red);
-    font-size: 0.85rem;
-    margin-bottom: 1rem;
-    display: none;
-  }
-  .error-msg.show { display: block; animation: shake 0.4s ease; }
-  @keyframes shake {
-    0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)}
-  }
-
-  .login-footer {
-    text-align: center;
-    margin-top: 2rem;
-    color: var(--text2);
-    font-size: 0.75rem;
-    letter-spacing: 1px;
-    animation: fadeUp 0.7s 0.3s ease both;
-  }
-  .login-footer span { color: var(--gold); }
-
-  /* Loading overlay */
-  .loader-overlay {
-    position: fixed;
-    inset: 0;
-    background: var(--dark);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    transition: opacity 0.5s;
-  }
-  .loader-overlay.hide { opacity: 0; pointer-events: none; }
-
-  .loader-ring {
-    width: 54px; height: 54px;
-    border: 3px solid var(--border);
-    border-top-color: var(--gold);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin-bottom: 1.2rem;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .loader-text {
-    font-family: 'Rajdhani', sans-serif;
-    letter-spacing: 3px;
-    font-size: 0.85rem;
-    color: var(--text2);
-    text-transform: uppercase;
-    animation: pulse 1.5s ease-in-out infinite;
-  }
-  @keyframes pulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
-
-  @keyframes fadeDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes fadeUp   { from{opacity:0;transform:translateY(20px)}  to{opacity:1;transform:translateY(0)} }
+/* Admin link */
+.admin-link {
+  display: block; text-align: center; margin-top: 1rem;
+  color: var(--text3); font-size: 0.75rem; text-decoration: none;
+  transition: color 0.2s;
+}
+.admin-link:hover { color: var(--gold); }
 </style>
 </head>
 <body>
 
-<!-- Loader -->
-<div class="loader-overlay" id="loaderOverlay">
-  <div class="loader-ring"></div>
-  <div class="loader-text">MITV Network Loading...</div>
+<!-- Animated BG -->
+<div class="bg-canvas">
+  <div class="particles"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
 </div>
 
-<div class="login-wrap">
+<!-- Loader -->
+<div class="loader-overlay" id="loaderOverlay">
+  <img src="https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png" class="loader-logo" alt="MITV Logo">
+  <div class="loader-ring"></div>
+  <div class="loader-text">MITV Network Loading...</div>
+  <div class="loader-progress"><div class="loader-progress-bar"></div></div>
+</div>
+
+<!-- Sound toggle -->
+<button onclick="toggleSound()" id="soundToggle" style="position:fixed;top:1rem;right:1rem;z-index:99;background:var(--glass2);border:1px solid var(--border);border-radius:8px;padding:0.4rem 0.7rem;color:var(--text);cursor:pointer;font-size:1rem;backdrop-filter:blur(10px);">🔊</button>
+
+<!-- PWA Install Banner -->
+<div class="pwa-banner" id="pwaBanner">
+  <img src="https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png" class="pwa-banner-logo" alt="MITV">
+  <div class="pwa-banner-text">
+    <div class="pwa-banner-title">MITV App Install Karein</div>
+    <div class="pwa-banner-sub">Home screen pe add karein — fast access</div>
+  </div>
+  <button class="btn btn-gold btn-sm" onclick="installPWA()">Install</button>
+</div>
+
+<div class="login-page">
   <div class="logo-area">
-    <div class="logo-icon">📡</div>
+    <div class="logo-img-wrap">
+      <img src="https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png" alt="MITV Logo">
+    </div>
     <div class="logo-title">MITV Network</div>
-    <div class="logo-sub">Reseller Management Portal v2.0</div>
+    <div class="logo-sub">Reseller Management Portal v3.0</div>
   </div>
 
-  <div class="login-card">
-    <div class="card-title">🔐 Reseller Login</div>
-    <div class="card-sub">Apna phone number aur password darj karein</div>
+  <div class="auth-card card-3d" style="padding:1.8rem 2rem;">
+    <div class="gold-line"></div>
 
-    <div class="error-msg" id="errorMsg">❌ Galat credentials. Check karein.</div>
-
-    <div class="field-wrap">
-      <label class="field-label">Phone Number</label>
-      <span class="field-icon">📞</span>
-      <input type="tel" class="field-input" id="phoneInput" placeholder="03XX-XXXXXXX" autocomplete="off">
+    <!-- Tab Row -->
+    <div class="tab-row">
+      <button class="tab-btn active" id="tabLogin" onclick="switchTab('login')">🔐 Login</button>
+      <button class="tab-btn" id="tabRegister" onclick="switchTab('register')">📝 Register</button>
     </div>
 
-    <div class="field-wrap">
-      <label class="field-label">Password</label>
-      <span class="field-icon">🔑</span>
-      <input type="password" class="field-input" id="passInput" placeholder="••••••••">
+    <!-- LOGIN FORM -->
+    <div id="loginForm">
+      <div id="loginError" class="error-box"></div>
+      <div class="field-wrap">
+        <label class="field-label">Phone Number</label>
+        <span class="field-icon">📞</span>
+        <input type="tel" class="form-input" id="loginPhone" placeholder="03XX-XXXXXXX" autocomplete="tel">
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">Password</label>
+        <span class="field-icon">🔑</span>
+        <input type="password" class="form-input" id="loginPass" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn btn-gold btn-full" id="loginBtn" onclick="doLogin()" style="margin-top:0.3rem; padding:0.9rem; font-size:0.95rem; letter-spacing:2px;">
+        LOGIN KAREIN
+      </button>
+      <a href="admin.html" class="admin-link">👑 Admin Portal →</a>
     </div>
 
-    <button class="btn-login" id="loginBtn" onclick="doLogin()">
-      <span class="btn-shine"></span>
-      Login Karein
-    </button>
+    <!-- REGISTER FORM -->
+    <div id="registerForm" style="display:none;">
+      <div style="background:rgba(240,180,41,0.08);border:1px solid var(--border2);border-radius:10px;padding:0.8rem 1rem;margin-bottom:1.2rem;font-size:0.82rem;color:var(--text2);line-height:1.6;">
+        ℹ️ Registration request admin (Muaaz) ke paas jayegi. Approve hone ke baad login kar sakte ho.
+      </div>
+      <div id="registerError"   class="error-box"></div>
+      <div id="registerSuccess" class="success-box"></div>
+      <div class="field-wrap">
+        <label class="field-label">Pura Naam</label>
+        <span class="field-icon">👤</span>
+        <input type="text" class="form-input" id="regName" placeholder="Muhammad Ali">
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">WhatsApp Number</label>
+        <span class="field-icon">📞</span>
+        <input type="tel" class="form-input" id="regPhone" placeholder="03XX-XXXXXXX">
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">City / Shehar</label>
+        <span class="field-icon">📍</span>
+        <input type="text" class="form-input" id="regCity" placeholder="Lahore, Karachi...">
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">Password Chahiye</label>
+        <span class="field-icon">🔒</span>
+        <input type="password" class="form-input" id="regPass" placeholder="Secure password">
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">MITV Se Kaise Suna?</label>
+        <span class="field-icon">💬</span>
+        <input type="text" class="form-input" id="regRef" placeholder="Dost, social media...">
+      </div>
+      <button class="btn btn-gold btn-full" id="registerBtn" onclick="doRegister()" style="margin-top:0.3rem; padding:0.9rem; font-size:0.92rem; letter-spacing:1px;">
+        📤 Request Bhejo
+      </button>
+    </div>
   </div>
 
   <div class="login-footer">
-    🏢 Project of <span>MUSLIM ISLAM</span> &nbsp;|&nbsp; 👑 Founder: <span>Muaaz Iqbal</span> (Kasur)
+    🏢 Project of <span class="gold">MUSLIM ISLAM</span> &nbsp;|&nbsp; 👑 <span class="gold">Muaaz Iqbal</span> (Kasur, Punjab)
   </div>
 </div>
 
-<!-- Firebase SDK -->
+<div id="toastContainer"></div>
+
+<!-- Scripts -->
+<script src="js/sounds.js"></script>
 <script type="module">
-   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('MITV PWA Active!'))
-        .catch(err => console.log('PWA Error', err));
-    });
-  }
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-  import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
+import { initializeApp }    from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+import { getDatabase, ref, get, push, set }
+  from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
+import { firebaseConfig, showToast, registerSW } from './js/firebase-config.js';
 
-  // ── FIREBASE CONFIG — apna config yahan daalo ──────────────────────────
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "ramadan-2385b.firebaseapp.com",
-    databaseURL: "https://ramadan-2385b-default-rtdb.firebaseio.com",
-    projectId: "ramadan-2385b",
-    storageBucket: "ramadan-2385b.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
 
-  const app = initializeApp(firebaseConfig);
-  const db  = getDatabase(app);
+registerSW();
 
-  // Hide loader after init
-  setTimeout(() => {
-    document.getElementById('loaderOverlay').classList.add('hide');
-  }, 1000);
+// ── HIDE LOADER ──────────────────────────────────────────────
+setTimeout(() => {
+  document.getElementById('loaderOverlay').classList.add('hide');
+}, 1800);
 
-  // Enter key support
-  document.getElementById('passInput').addEventListener('keydown', e => {
-    if(e.key === 'Enter') doLogin();
-  });
-
-  window.doLogin = async function() {
-    const phone = document.getElementById('phoneInput').value.trim();
-    const pass  = document.getElementById('passInput').value.trim();
-    const err   = document.getElementById('errorMsg');
-    const btn   = document.getElementById('loginBtn');
-
-    if(!phone || !pass) {
-      err.textContent = '⚠️ Phone aur password dono zaroori hain.';
-      err.classList.add('show');
-      return;
-    }
-
-    btn.textContent = '⏳ Verify ho raha hai...';
-    btn.disabled    = true;
-    err.classList.remove('show');
-
+// ── CHECK SAVED SESSION ──────────────────────────────────────
+window.addEventListener('load', () => {
+  const saved = localStorage.getItem('mitv_session');
+  if (saved) {
     try {
-      const snap = await get(ref(db, 'resellers'));
-      if(!snap.exists()) throw new Error('No resellers found');
-
-      const resellers = snap.val();
-      let found = null;
-
-      for(const [rid, data] of Object.entries(resellers)) {
-        if(data.number === phone && data.password === pass && data.active !== false) {
-          found = { ...data, id: rid };
-          break;
-        }
+      const s = JSON.parse(saved);
+      if (s && s.id && s.role) {
+        // Auto-redirect with PIN check
+        sessionStorage.setItem('mitv_reseller', saved);
+        window.location.href = s.role === 'admin' ? 'admin.html' : 'dashboard.html';
       }
+    } catch(e) { localStorage.removeItem('mitv_session'); }
+  }
+});
 
-      if(found) {
-        sessionStorage.setItem('mitv_reseller', JSON.stringify(found));
-        window.location.href = 'dashboard.html';
-      } else {
-        throw new Error('Invalid credentials');
+// ── ENTER KEY ────────────────────────────────────────────────
+['loginPhone','loginPass'].forEach(id => {
+  document.getElementById(id)?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') window.doLogin();
+  });
+});
+
+// ── TAB SWITCH ───────────────────────────────────────────────
+window.switchTab = function(tab) {
+  playSound('nav');
+  const isLogin = tab === 'login';
+  document.getElementById('loginForm').style.display    = isLogin ? 'block' : 'none';
+  document.getElementById('registerForm').style.display = isLogin ? 'none'  : 'block';
+  document.getElementById('tabLogin').classList.toggle('active',    isLogin);
+  document.getElementById('tabRegister').classList.toggle('active', !isLogin);
+};
+
+// ── LOGIN ────────────────────────────────────────────────────
+window.doLogin = async function() {
+  const phone = document.getElementById('loginPhone').value.trim();
+  const pass  = document.getElementById('loginPass').value.trim();
+  const errEl = document.getElementById('loginError');
+  const btn   = document.getElementById('loginBtn');
+
+  errEl.classList.remove('show');
+
+  if (!phone || !pass) {
+    errEl.textContent = '⚠️ Phone aur password dono zaroori hain.';
+    errEl.classList.add('show');
+    playSound('error');
+    return;
+  }
+
+  btn.disabled  = true;
+  btn.innerHTML = '<span class="spinner"></span> Verify ho raha hai...';
+
+  try {
+    const snap = await get(ref(db, 'resellers'));
+    if (!snap.exists()) throw new Error('No resellers');
+
+    let found = null;
+    for (const [rid, data] of Object.entries(snap.val())) {
+      if (data.number === phone && data.password === pass && data.active !== false) {
+        found = { ...data, id: rid, role: 'reseller' };
+        break;
       }
-    } catch(e) {
-      err.textContent = '❌ Galat credentials ya account disabled.';
-      err.classList.add('show');
-      btn.textContent = 'Login Karein';
-      btn.disabled    = false;
     }
-  };
+
+    if (found) {
+      // Save session — remember me
+      localStorage.setItem('mitv_session', JSON.stringify(found));
+      sessionStorage.setItem('mitv_reseller', JSON.stringify(found));
+      playSound('success');
+      showToast(`✅ Welcome, ${found.name}!`, 'success');
+      setTimeout(() => window.location.href = 'dashboard.html', 800);
+    } else {
+      throw new Error('invalid');
+    }
+  } catch(e) {
+    playSound('error');
+    errEl.textContent = '❌ Galat phone number ya password.';
+    errEl.classList.add('show');
+    btn.disabled  = false;
+    btn.innerHTML = 'LOGIN KAREIN';
+  }
+};
+
+// ── REGISTER ─────────────────────────────────────────────────
+window.doRegister = async function() {
+  const name  = document.getElementById('regName').value.trim();
+  const phone = document.getElementById('regPhone').value.trim();
+  const city  = document.getElementById('regCity').value.trim();
+  const pass  = document.getElementById('regPass').value.trim();
+  const ref2  = document.getElementById('regRef').value.trim();
+  const errEl = document.getElementById('registerError');
+  const sukEl = document.getElementById('registerSuccess');
+  const btn   = document.getElementById('registerBtn');
+
+  errEl.classList.remove('show'); sukEl.classList.remove('show');
+
+  if (!name || !phone || !pass) {
+    errEl.textContent = '⚠️ Naam, phone aur password zaroori hain.';
+    errEl.classList.add('show'); playSound('error'); return;
+  }
+  if (pass.length < 4) {
+    errEl.textContent = '⚠️ Password kam az kam 4 characters ka hona chahiye.';
+    errEl.classList.add('show'); playSound('error'); return;
+  }
+
+  btn.disabled  = true;
+  btn.innerHTML = '<span class="spinner"></span> Bhej raha hai...';
+
+  try {
+    // Save to reseller_requests node — admin will approve
+    await push(ref(db, 'reseller_requests'), {
+      name, phone, city, password: pass, reference: ref2,
+      status:      'pending',
+      requested_at: Date.now()
+    });
+
+    playSound('deploy');
+    sukEl.innerHTML = `✅ <strong>Request bhaij di gayi!</strong><br>Admin (Muaaz) aapko approve karega aur login details bhejega.<br><br>📞 Contact: Muaaz Iqbal (Kasur)`;
+    sukEl.classList.add('show');
+    btn.disabled  = false;
+    btn.innerHTML = '📤 Request Bhejo';
+    // Clear form
+    ['regName','regPhone','regCity','regPass','regRef'].forEach(id => { document.getElementById(id).value = ''; });
+
+  } catch(e) {
+    playSound('error');
+    errEl.textContent = '❌ Error: ' + e.message;
+    errEl.classList.add('show');
+    btn.disabled  = false;
+    btn.innerHTML = '📤 Request Bhejo';
+  }
+};
 </script>
 </body>
 </html>

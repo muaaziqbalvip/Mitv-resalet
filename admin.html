@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#f0b429">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>MITV — Admin Panel (Muaaz)</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="css/shared.css">
+<style>
+/* ── LAYOUT ────────────────────────────────────────────────── */
+.app-layout { display:flex; min-height:100vh; min-height:100dvh; position:relative; z-index:1; }
+
+.sidebar {
+  position: fixed; left:0; top:0; bottom:0; width:250px;
+  background: var(--glass); backdrop-filter:blur(20px);
+  border-right: 1px solid var(--border); display:flex; flex-direction:column;
+  z-index:100; transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+.sidebar-logo { padding:1.4rem 1.2rem; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:0.85rem; }
+.logo-img { width:38px; height:38px; object-fit:contain; filter:drop-shadow(0 0 8px rgba(240,180,41,0.5)); }
+.logo-name { font-family:var(--font-head); font-size:0.9rem; letter-spacing:2px; color:var(--gold); }
+.logo-role { font-size:0.65rem; color:var(--text2); letter-spacing:1px; margin-top:1px; }
+
+.admin-badge {
+  margin:1rem; background:linear-gradient(135deg,rgba(240,180,41,0.12),rgba(240,180,41,0.06));
+  border:1px solid var(--border2); border-radius:12px; padding:0.9rem 1rem;
+  display:flex; align-items:center; gap:0.7rem;
+}
+.admin-avatar { width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,var(--gold),var(--gold3)); display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0; box-shadow:0 0 15px rgba(240,180,41,0.3); }
+.admin-name   { font-weight:700; font-size:0.88rem; color:var(--gold2); }
+.admin-role   { font-size:0.7rem; color:var(--text2); margin-top:1px; }
+
+.nav-group { padding:0.5rem 0.8rem; }
+.nav-label { font-family:var(--font-head); font-size:0.6rem; letter-spacing:2.5px; text-transform:uppercase; color:var(--text3); padding:0 0.4rem; margin-bottom:0.4rem; }
+
+.nav-item {
+  display:flex; align-items:center; gap:0.75rem;
+  padding:0.7rem 0.9rem; border-radius:10px; cursor:pointer;
+  color:var(--text2); font-size:0.86rem; transition:var(--transition);
+  margin-bottom:2px; user-select:none; position:relative;
+}
+.nav-item:hover { background:rgba(240,180,41,0.07); color:var(--text); }
+.nav-item.active { background:rgba(240,180,41,0.13); color:var(--gold); }
+.nav-item.active::before { content:''; position:absolute; left:0; top:20%; bottom:20%; width:3px; background:var(--gold); border-radius:0 3px 3px 0; box-shadow:0 0 8px var(--gold); }
+.nav-icon { font-size:1rem; width:22px; text-align:center; }
+.nav-badge { margin-left:auto; background:var(--red); color:#fff; font-size:0.65rem; font-weight:700; padding:1px 6px; border-radius:10px; min-width:18px; text-align:center; }
+
+.sidebar-footer { margin-top:auto; padding:1rem; border-top:1px solid var(--border); display:flex; gap:0.5rem; }
+.btn-logout2 { flex:1; padding:0.6rem; background:rgba(255,77,109,0.1); border:1px solid rgba(255,77,109,0.2); border-radius:9px; color:var(--red); font-family:var(--font-body); font-size:0.8rem; cursor:pointer; transition:var(--transition); }
+.btn-logout2:hover { background:rgba(255,77,109,0.2); }
+
+/* ── MAIN ─────────────────────────────────────────────────── */
+.main { margin-left:250px; flex:1; display:flex; flex-direction:column; }
+.topbar {
+  background:var(--glass); backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border); padding:0.9rem 1.6rem;
+  display:flex; align-items:center; justify-content:space-between;
+  position:sticky; top:0; z-index:50;
+}
+.topbar-left { display:flex; align-items:center; gap:0.9rem; }
+.hamburger { display:none; background:none; border:none; color:var(--text); font-size:1.4rem; cursor:pointer; }
+.page-title { font-family:var(--font-head); font-size:1rem; letter-spacing:3px; color:var(--text); }
+
+.topbar-right { display:flex; align-items:center; gap:0.8rem; }
+.clock-badge { background:var(--dark2); border:1px solid var(--border); border-radius:8px; padding:0.35rem 0.8rem; font-family:var(--font-mono); font-size:0.78rem; color:var(--text2); }
+
+/* ── PAGES ─────────────────────────────────────────────────── */
+.page { display:none; padding:1.6rem; animation:fadeInUp 0.35s ease; }
+.page.active { display:block; }
+
+/* ── STATS GRID ────────────────────────────────────────────── */
+.stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1rem; margin-bottom:1.6rem; }
+.stat-card {
+  background:var(--glass); backdrop-filter:blur(15px); border:1px solid var(--border);
+  border-radius:14px; padding:1.2rem 1.3rem; position:relative; overflow:hidden;
+  transition:var(--transition); cursor:default;
+}
+.stat-card:hover { transform:translateY(-3px) scale(1.01); border-color:var(--border2); box-shadow:var(--glow-gold); }
+.stat-card::after { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
+.sc-gold::after   { background:linear-gradient(90deg,transparent,var(--gold),transparent); }
+.sc-green::after  { background:linear-gradient(90deg,transparent,var(--green),transparent); }
+.sc-red::after    { background:linear-gradient(90deg,transparent,var(--red),transparent); }
+.sc-blue::after   { background:linear-gradient(90deg,transparent,var(--blue),transparent); }
+.sc-purple::after { background:linear-gradient(90deg,transparent,var(--purple),transparent); }
+
+.stat-icon  { font-size:1.6rem; margin-bottom:0.5rem; }
+.stat-num   { font-family:var(--font-head); font-size:2rem; font-weight:700; line-height:1; }
+.stat-label { color:var(--text2); font-size:0.72rem; text-transform:uppercase; letter-spacing:1px; margin-top:0.25rem; }
+.stat-ghost { position:absolute; right:-8px; bottom:-8px; font-size:3.5rem; opacity:0.05; }
+.num-gold   { color:var(--gold); }
+.num-green  { color:var(--green); }
+.num-red    { color:var(--red); }
+.num-blue   { color:var(--blue); }
+.num-purple { color:var(--purple); }
+
+/* ── SECTION HEADER ─────────────────────────────────────────── */
+.section-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.1rem; flex-wrap:wrap; gap:0.7rem; }
+.section-ttl { font-family:var(--font-head); font-size:0.85rem; letter-spacing:2.5px; color:var(--gold); text-transform:uppercase; }
+
+/* ── TABLE ──────────────────────────────────────────────────── */
+.table-card { background:var(--glass); backdrop-filter:blur(15px); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+.table-head { display:grid; padding:0.85rem 1.2rem; background:rgba(0,0,0,0.2); border-bottom:1px solid var(--border); font-family:var(--font-head); font-size:0.62rem; letter-spacing:2px; color:var(--text2); text-transform:uppercase; }
+.table-row  { display:grid; padding:0.9rem 1.2rem; border-bottom:1px solid var(--border); align-items:center; transition:background 0.15s; }
+.table-row:last-child { border-bottom:none; }
+.table-row:hover { background:rgba(240,180,41,0.04); }
+.table-row.anim { animation:fadeInLeft 0.3s ease both; }
+
+/* Resellers table: cols */
+.tbl-res { grid-template-columns:1.2fr 1.3fr 0.8fr 0.7fr 0.9fr 1fr; }
+.tbl-req { grid-template-columns:1fr 1.2fr 0.9fr 0.8fr 1fr; }
+.tbl-cli { grid-template-columns:1fr 1.2fr 1fr 0.8fr 1fr; }
+
+.cell-name  { font-weight:600; font-size:0.88rem; }
+.cell-mono  { font-family:var(--font-mono); font-size:0.75rem; color:var(--text2); }
+.cell-label { font-size:0.8rem; }
+.actions    { display:flex; gap:0.4rem; flex-wrap:wrap; }
+
+/* ── CHAT PANEL ─────────────────────────────────────────────── */
+.chat-grid { display:grid; grid-template-columns:280px 1fr; gap:1rem; height:calc(100vh - 160px); min-height:400px; }
+.chat-sidebar-panel { background:var(--glass); border:1px solid var(--border); border-radius:14px; display:flex; flex-direction:column; overflow:hidden; }
+.chat-list { overflow-y:auto; flex:1; }
+.chat-list-item { padding:0.85rem 1rem; border-bottom:1px solid var(--border); cursor:pointer; transition:background 0.15s; display:flex; align-items:center; gap:0.75rem; }
+.chat-list-item:hover { background:rgba(240,180,41,0.06); }
+.chat-list-item.active { background:rgba(240,180,41,0.1); border-left:3px solid var(--gold); }
+.chat-list-avatar { width:36px; height:36px; border-radius:50%; background:var(--panel2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
+.chat-list-name  { font-size:0.86rem; font-weight:600; }
+.chat-list-last  { font-size:0.73rem; color:var(--text2); margin-top:0.15rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.chat-unread { background:var(--gold); color:var(--dark); border-radius:50%; width:18px; height:18px; font-size:0.65rem; font-weight:700; display:flex; align-items:center; justify-content:center; margin-left:auto; flex-shrink:0; }
+
+.chat-main-panel { background:var(--glass); border:1px solid var(--border); border-radius:14px; display:flex; flex-direction:column; overflow:hidden; }
+.chat-header { padding:1rem 1.2rem; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:0.8rem; }
+.chat-header-info { flex:1; }
+.chat-header-name { font-weight:700; font-size:0.95rem; }
+.chat-header-sub  { font-size:0.72rem; color:var(--text2); }
+.chat-body   { flex:1; overflow:hidden; }
+.chat-input-area { padding:1rem; border-top:1px solid var(--border); display:flex; gap:0.7rem; }
+.chat-input-box  { flex:1; background:var(--dark2); border:1px solid var(--border); border-radius:10px; padding:0.7rem 1rem; color:var(--text); font-family:var(--font-body); font-size:0.88rem; outline:none; resize:none; transition:var(--transition); max-height:100px; }
+.chat-input-box:focus { border-color:var(--gold); }
+
+/* ── REVENUE CARD ───────────────────────────────────────────── */
+.revenue-card { background:linear-gradient(135deg,rgba(240,180,41,0.1),rgba(240,180,41,0.04)); border:1px solid var(--border2); border-radius:14px; padding:1.4rem; margin-bottom:1rem; }
+.revenue-row  { display:flex; justify-content:space-between; align-items:center; padding:0.5rem 0; border-bottom:1px solid var(--border); }
+.revenue-row:last-child { border-bottom:none; padding-top:0.8rem; }
+.revenue-label { color:var(--text2); font-size:0.82rem; }
+.revenue-val   { font-family:var(--font-head); font-size:1.1rem; color:var(--gold); }
+.revenue-total { font-size:1.4rem; color:var(--gold2); }
+
+/* ── PIN OVERLAY ────────────────────────────────────────────── */
+.pin-title { font-family:var(--font-head); font-size:0.85rem; letter-spacing:2px; color:var(--gold); text-transform:uppercase; margin-bottom:0.3rem; }
+.pin-sub   { font-size:0.78rem; color:var(--text2); margin-bottom:0.5rem; }
+
+/* ── MOBILE ─────────────────────────────────────────────────── */
+.sidebar-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:99; }
+@media(max-width:900px) {
+  .sidebar { transform:translateX(-100%); }
+  .sidebar.open { transform:translateX(0); }
+  .sidebar-bg.show { display:block; }
+  .main { margin-left:0; }
+  .hamburger { display:block; }
+  .chat-grid { grid-template-columns:1fr; height:auto; }
+  .chat-sidebar-panel { max-height:220px; }
+  .tbl-res { grid-template-columns:1fr 1fr 0.8fr 1fr; }
+  .tbl-res .hide-sm { display:none; }
+}
+</style>
+</head>
+<body>
+<div class="bg-canvas"><div class="particles"></div><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+
+<!-- Loader -->
+<div class="loader-overlay" id="loaderOverlay">
+  <img src="https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png" class="loader-logo" alt="MITV">
+  <div class="loader-ring"></div>
+  <div class="loader-text">Admin Panel Loading...</div>
+  <div class="loader-progress"><div class="loader-progress-bar"></div></div>
+</div>
+
+<!-- PIN Lock -->
+<div class="pin-overlay" id="pinOverlay">
+  <div class="pin-card anim-scalein">
+    <div class="gold-line"></div>
+    <img src="https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png" style="width:50px;margin:0 auto 1rem;display:block;filter:drop-shadow(0 0 12px rgba(240,180,41,0.5));" alt="MITV">
+    <div class="pin-title">Admin PIN</div>
+    <div class="pin-sub">4-digit PIN darj karein</div>
+    <div class="pin-display" id="pinDisplay">
+      <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
+    </div>
+    <div class="pin-grid" id="pinGrid"></div>
+    <div id="pinError" style="color:var(--red);font-size:0.78rem;margin-top:0.8rem;min-height:1.2em;text-align:center;"></div>
+  </div>
+</div>
+
+<!-- Sidebar BG -->
+<div class="sidebar-bg" id="sidebarBg" onclick="closeSidebar()"></div>
+
+<div class="app-layout">
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png" class="logo-img" alt="MITV">
+      <div><div class="logo-name">MITV</div><div class="logo-role">Admin Panel</div></div>
+    </div>
+
+    <div class="admin-badge">
+      <div class="admin-avatar">👑</div>
+      <div><div class="admin-name">Muaaz Iqbal</div><div class="admin-role">Super Admin — Kasur</div></div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Dashboard</div>
+      <div class="nav-item active" data-page="dashboard" onclick="goPage('dashboard')"><span class="nav-icon">🏠</span> Dashboard</div>
+      <div class="nav-item" data-page="analytics" onclick="goPage('analytics')"><span class="nav-icon">📊</span> Analytics</div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-label">Resellers</div>
+      <div class="nav-item" data-page="resellers" onclick="goPage('resellers')"><span class="nav-icon">🧑‍💼</span> All Resellers</div>
+      <div class="nav-item" data-page="requests"  onclick="goPage('requests')"><span class="nav-icon">📬</span> Join Requests <span class="nav-badge" id="reqBadge" style="display:none">0</span></div>
+      <div class="nav-item" data-page="clients"   onclick="goPage('clients')"><span class="nav-icon">👥</span> All Clients</div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-label">Tools</div>
+      <div class="nav-item" data-page="chat"     onclick="goPage('chat')"><span class="nav-icon">💬</span> Chat System</div>
+      <div class="nav-item" data-page="library"  onclick="goPage('library')"><span class="nav-icon">📚</span> Playlist Library</div>
+      <div class="nav-item" data-page="ai"       onclick="goPage('ai')"><span class="nav-icon">🧠</span> MI AI</div>
+    </div>
+
+    <div class="sidebar-footer">
+      <button class="btn-logout2" onclick="logout()">🚪 Logout</button>
+      <button style="padding:0.6rem 0.8rem;background:var(--panel2);border:1px solid var(--border);border-radius:9px;color:var(--text2);cursor:pointer;" id="soundToggle" onclick="toggleSound()">🔊</button>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" onclick="openSidebar()">☰</button>
+        <div class="page-title" id="pageTitle">DASHBOARD</div>
+      </div>
+      <div class="topbar-right">
+        <div class="online-dot" id="netDot"></div>
+        <div class="clock-badge" id="clockBadge">--:--:--</div>
+        <div id="soundToggle2" onclick="toggleSound()" style="cursor:pointer;font-size:1.1rem;">🔊</div>
+      </div>
+    </div>
+
+    <!-- PAGE: DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid stagger anim-fadeup">
+        <div class="stat-card sc-gold"><div class="stat-icon">🧑‍💼</div><div class="stat-num num-gold" id="sd-resellers">—</div><div class="stat-label">Total Resellers</div><div class="stat-ghost">🧑‍💼</div></div>
+        <div class="stat-card sc-green"><div class="stat-icon">👥</div><div class="stat-num num-green" id="sd-clients">—</div><div class="stat-label">Total Clients</div><div class="stat-ghost">👥</div></div>
+        <div class="stat-card sc-blue"><div class="stat-icon">✅</div><div class="stat-num num-blue" id="sd-paid">—</div><div class="stat-label">Paid Active</div><div class="stat-ghost">✅</div></div>
+        <div class="stat-card sc-red"><div class="stat-icon">🚫</div><div class="stat-num num-red" id="sd-blocked">—</div><div class="stat-label">Blocked</div><div class="stat-ghost">🚫</div></div>
+        <div class="stat-card sc-purple"><div class="stat-icon">📬</div><div class="stat-num num-purple" id="sd-requests">—</div><div class="stat-label">Pending Requests</div><div class="stat-ghost">📬</div></div>
+      </div>
+
+      <!-- Revenue -->
+      <div class="section-hdr"><div class="section-ttl">💰 Revenue Estimate</div></div>
+      <div class="revenue-card">
+        <div class="revenue-row"><span class="revenue-label">Monthly (Paid × Rs 300)</span><span class="revenue-val" id="rev-monthly">—</span></div>
+        <div class="revenue-row"><span class="revenue-label">Setup Fees (Total × Rs 100)</span><span class="revenue-val" id="rev-setup">—</span></div>
+        <div class="revenue-row"><span class="revenue-label" style="color:var(--gold2);font-weight:700;">Total Estimated Revenue</span><span class="revenue-val revenue-total" id="rev-total">—</span></div>
+      </div>
+
+      <!-- Recent Requests -->
+      <div class="section-hdr" style="margin-top:1.4rem;">
+        <div class="section-ttl">📬 Recent Join Requests</div>
+        <button class="btn btn-outline btn-sm" onclick="goPage('requests')">Sab dekho →</button>
+      </div>
+      <div class="table-card">
+        <div class="table-head tbl-req"><span>Name</span><span>Phone</span><span>City</span><span>Status</span><span>Actions</span></div>
+        <div id="dashRequestList"><div style="text-align:center;padding:2rem;color:var(--text2);"><div class="spinner"></div></div></div>
+      </div>
+    </div>
+
+    <!-- PAGE: RESELLERS -->
+    <div class="page" id="page-resellers">
+      <div class="section-hdr">
+        <div class="section-ttl">🧑‍💼 All Resellers</div>
+        <button class="btn btn-gold btn-sm" onclick="openModal('addResellerModal')">➕ Add Reseller</button>
+      </div>
+      <div class="table-card">
+        <div class="table-head tbl-res"><span>Name</span><span>Phone</span><span>Clients</span><span class="hide-sm">Status</span><span class="hide-sm">Joined</span><span>Actions</span></div>
+        <div id="resellerList"><div style="text-align:center;padding:2rem;"><div class="spinner"></div></div></div>
+      </div>
+    </div>
+
+    <!-- PAGE: REQUESTS -->
+    <div class="page" id="page-requests">
+      <div class="section-hdr">
+        <div class="section-ttl">📬 Reseller Join Requests</div>
+        <button class="btn btn-outline btn-sm" onclick="loadRequests()">🔄 Refresh</button>
+      </div>
+      <div class="table-card">
+        <div class="table-head tbl-req"><span>Name</span><span>Phone</span><span>City</span><span>Status</span><span>Actions</span></div>
+        <div id="requestList"><div style="text-align:center;padding:2rem;"><div class="spinner"></div></div></div>
+      </div>
+    </div>
+
+    <!-- PAGE: ALL CLIENTS -->
+    <div class="page" id="page-clients">
+      <div class="section-hdr">
+        <div class="section-ttl">👥 All Clients</div>
+        <div style="display:flex;gap:0.7rem;align-items:center;">
+          <input type="text" class="form-input" style="width:220px;padding:0.5rem 0.9rem;" id="clientSearch" placeholder="Search..." oninput="filterAdminClients()">
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-head tbl-cli"><span>Name</span><span>Phone</span><span>UID</span><span>Status</span><span>Actions</span></div>
+        <div id="adminClientList"><div style="text-align:center;padding:2rem;"><div class="spinner"></div></div></div>
+      </div>
+    </div>
+
+    <!-- PAGE: CHAT -->
+    <div class="page" id="page-chat">
+      <div class="section-hdr"><div class="section-ttl">💬 Reseller Chat</div></div>
+      <div class="chat-grid">
+        <div class="chat-sidebar-panel">
+          <div style="padding:0.85rem 1rem;border-bottom:1px solid var(--border);font-family:var(--font-head);font-size:0.7rem;letter-spacing:2px;color:var(--text2);">CONVERSATIONS</div>
+          <div class="chat-list" id="chatList"><div style="text-align:center;padding:2rem;color:var(--text2);"><div class="spinner"></div></div></div>
+        </div>
+        <div class="chat-main-panel">
+          <div class="chat-header">
+            <div class="chat-avatar avatar-admin" style="width:38px;height:38px;">👑</div>
+            <div class="chat-header-info">
+              <div class="chat-header-name" id="chatWithName">Reseller Select Karein</div>
+              <div class="chat-header-sub"  id="chatWithId">—</div>
+            </div>
+            <div class="online-dot offline" id="chatOnlineDot"></div>
+          </div>
+          <div class="chat-body">
+            <div class="chat-messages" id="adminChatMessages" style="height:100%;max-height:none;">
+              <div style="text-align:center;color:var(--text2);padding:3rem;font-size:0.85rem;">Left panel se reseller select karein 💬</div>
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <textarea class="chat-input-box" id="adminChatInput" placeholder="Message likhein..." rows="1" onkeydown="handleAdminChatKey(event)"></textarea>
+            <button class="btn btn-gold" onclick="sendAdminMessage()">➤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: LIBRARY -->
+    <div class="page" id="page-library">
+      <div class="section-hdr">
+        <div class="section-ttl">📚 Playlist Library</div>
+        <button class="btn btn-gold btn-sm" onclick="openModal('addLibModal')">➕ Add Source</button>
+      </div>
+      <div class="table-card">
+        <div class="table-head" style="grid-template-columns:1.5fr 2fr 1fr;"><span>Name</span><span>URL</span><span>Actions</span></div>
+        <div id="libraryList"><div style="text-align:center;padding:2rem;"><div class="spinner"></div></div></div>
+      </div>
+    </div>
+
+    <!-- PAGE: AI -->
+    <div class="page" id="page-ai">
+      <div class="section-hdr">
+        <div class="section-ttl">🧠 MI AI — Admin Mode</div>
+        <button class="btn btn-outline btn-sm" onclick="clearAdminAI()">🗑 Clear</button>
+      </div>
+      <div style="max-width:760px;">
+        <div style="display:inline-flex;align-items:center;gap:0.5rem;background:rgba(240,180,41,0.1);border:1px solid var(--border2);border-radius:20px;padding:0.35rem 1rem;font-size:0.75rem;color:var(--gold);margin-bottom:1rem;">
+          🤖 Groq LLaMA-3 70B — Auto Key Rotation Enabled
+        </div>
+        <div class="table-card" style="background:transparent;">
+          <div class="chat-messages" id="adminAiMessages" style="min-height:360px;max-height:420px;background:var(--glass);border-radius:14px 14px 0 0;">
+            <div class="chat-msg"><div class="chat-avatar avatar-ai">🧠</div>
+              <div class="chat-bubble">Assalam o Alaikum Admin! Main <strong>MI AI</strong> hoon.<br>Network management, analytics, reseller tips — kuch bhi poochhein! 💡</div>
+            </div>
+          </div>
+          <div class="chat-input-area" style="background:var(--glass);border-top:1px solid var(--border);border-radius:0 0 14px 14px;">
+            <input type="text" class="chat-input-box" style="border-radius:10px;resize:none;height:auto;padding:0.7rem 1rem;" id="adminAiInput" placeholder="AI se poochhein..." onkeydown="if(event.key==='Enter')sendAdminAI()">
+            <button class="btn btn-gold" onclick="sendAdminAI()">➤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: ANALYTICS -->
+    <div class="page" id="page-analytics">
+      <div class="section-hdr"><div class="section-ttl">📊 Network Analytics</div></div>
+      <div class="stats-grid stagger" id="analyticsGrid">
+        <div style="text-align:center;padding:3rem;grid-column:1/-1;color:var(--text2);"><div class="spinner spinner-lg"></div></div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app-layout -->
+
+<!-- ── MODALS ─────────────────────────────────────────────────── -->
+
+<!-- Add Reseller -->
+<div class="modal-overlay" id="addResellerModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">➕ Add Reseller</div><button class="modal-close" onclick="closeModal('addResellerModal')">✕</button></div>
+    <div class="modal-body">
+      <div id="addResError" class="error-box" style="display:none;"></div>
+      <div class="form-group"><label class="form-label">Pura Naam</label><input class="form-input" id="ar-name" placeholder="Muhammad Ali"></div>
+      <div class="form-group"><label class="form-label">Phone / WhatsApp</label><input class="form-input" id="ar-phone" type="tel" placeholder="03XX-XXXXXXX"></div>
+      <div class="form-group"><label class="form-label">City</label><input class="form-input" id="ar-city" placeholder="Lahore"></div>
+      <div class="form-group"><label class="form-label">Password Set Karein</label><input class="form-input" id="ar-pass" type="password" placeholder="Minimum 4 chars"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-glass" onclick="closeModal('addResellerModal')">Cancel</button>
+      <button class="btn btn-gold" id="addResBtn" onclick="addReseller()">✅ Add Karein</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Library -->
+<div class="modal-overlay" id="addLibModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">📚 Add Library Source</div><button class="modal-close" onclick="closeModal('addLibModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Source Naam</label><input class="form-input" id="lib-name" placeholder="IPTV Pakistan HD"></div>
+      <div class="form-group"><label class="form-label">M3U/M3U8 URL</label><input class="form-input" id="lib-url" placeholder="https://..."></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-glass" onclick="closeModal('addLibModal')">Cancel</button>
+      <button class="btn btn-gold" onclick="addLibSource()">➕ Add</button>
+    </div>
+  </div>
+</div>
+
+<div id="toastContainer"></div>
+
+<script src="js/sounds.js"></script>
+<script type="module">
+import { initializeApp }    from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+import { getDatabase, ref, get, set, update, remove, push, onValue, off }
+  from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
+import { firebaseConfig, showToast, formatTs, timeAgo, genUID, esc, startClock, calcRevenue, ADMIN_PIN, PRICING } from './js/firebase-config.js';
+import { groqChat, groqAsk } from './js/groq-ai.js';
+
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+
+// ── LOADER ──────────────────────────────────────────────────
+setTimeout(() => document.getElementById('loaderOverlay').classList.add('hide'), 2000);
+
+// ── CLOCK ───────────────────────────────────────────────────
+startClock('clockBadge');
+
+// ── NETWORK ─────────────────────────────────────────────────
+window.addEventListener('online',  () => document.getElementById('netDot').classList.remove('offline'));
+window.addEventListener('offline', () => document.getElementById('netDot').classList.add('offline'));
+
+// ── PIN LOCK ─────────────────────────────────────────────────
+let pinBuffer = '';
+const savedPin = localStorage.getItem('mitv_admin_pin') || ADMIN_PIN;
+
+function buildPinGrid() {
+  const grid = document.getElementById('pinGrid');
+  const keys = ['1','2','3','4','5','6','7','8','9','⌫','0','✓'];
+  grid.innerHTML = keys.map(k => `
+    <button class="pin-key ${k==='⌫'?'del':k==='✓'?'confirm':''}" onclick="pinPress('${k}')">${k}</button>
+  `).join('');
+}
+
+window.pinPress = function(k) {
+  playSound('pin');
+  if (k === '⌫') {
+    pinBuffer = pinBuffer.slice(0,-1);
+  } else if (k === '✓') {
+    checkPin();
+    return;
+  } else if (pinBuffer.length < 4) {
+    pinBuffer += k;
+  }
+  updatePinDots();
+  if (pinBuffer.length === 4) setTimeout(checkPin, 150);
+};
+
+function updatePinDots() {
+  for (let i=0;i<4;i++) {
+    const d = document.getElementById(`pd${i}`);
+    d.classList.toggle('filled', i < pinBuffer.length);
+    d.classList.remove('error');
+  }
+}
+
+function checkPin() {
+  if (pinBuffer === savedPin) {
+    playSound('pinOk');
+    document.getElementById('pinOverlay').classList.remove('show');
+    loadAllData();
+  } else {
+    playSound('pinWrong');
+    for(let i=0;i<4;i++) {
+      const d=document.getElementById(`pd${i}`);
+      d.classList.add('error'); d.classList.remove('filled');
+    }
+    document.getElementById('pinError').textContent = '❌ Galat PIN. Dobara try karein.';
+    pinBuffer = '';
+    setTimeout(() => { updatePinDots(); document.getElementById('pinError').textContent=''; }, 1200);
+  }
+}
+
+buildPinGrid();
+document.getElementById('pinOverlay').classList.add('show');
+
+// ── DATA STATE ───────────────────────────────────────────────
+let allResellers = {};
+let allClients   = {};
+let allRequests  = {};
+let allLibrary   = {};
+let chatWith     = null;
+let chatListener = null;
+let adminAiHistory = [];
+
+// ── LOAD ALL DATA ─────────────────────────────────────────────
+async function loadAllData() {
+  // Realtime listeners
+  onValue(ref(db,'resellers'),      snap => { allResellers = snap.val()||{}; renderDashboard(); renderResellers(); updateNavBadges(); });
+  onValue(ref(db,'reseller_requests'), snap => { allRequests = snap.val()||{}; renderRequests(); renderDashRequests(); updateNavBadges(); });
+  onValue(ref(db,'playlist_library'),  snap => { allLibrary  = snap.val()||{}; renderLibrary(); });
+
+  // Clients — aggregate from all resellers
+  onValue(ref(db,'master_users'), snap => {
+    allClients = snap.val() || {};
+    renderAdminClients();
+    renderDashboard();
+  });
+
+  // Chat list
+  loadChatList();
+}
+
+// ── DASHBOARD ────────────────────────────────────────────────
+function renderDashboard() {
+  const rCount = Object.keys(allResellers).length;
+  const cCount = Object.keys(allClients).length;
+  const paid   = Object.values(allClients).filter(c=>c.status==='Paid').length;
+  const blocked= cCount - paid;
+  const reqPending = Object.values(allRequests).filter(r=>r.status==='pending').length;
+
+  document.getElementById('sd-resellers').textContent = rCount;
+  document.getElementById('sd-clients').textContent   = cCount;
+  document.getElementById('sd-paid').textContent      = paid;
+  document.getElementById('sd-blocked').textContent   = blocked;
+  document.getElementById('sd-requests').textContent  = reqPending;
+
+  // Revenue
+  const monthly = paid * PRICING.monthly_rs;
+  const setup   = cCount * PRICING.setup_rs;
+  document.getElementById('rev-monthly').textContent = `Rs ${monthly.toLocaleString()}`;
+  document.getElementById('rev-setup').textContent   = `Rs ${setup.toLocaleString()}`;
+  document.getElementById('rev-total').textContent   = `Rs ${(monthly+setup).toLocaleString()}`;
+}
+
+function renderDashRequests() {
+  const el = document.getElementById('dashRequestList');
+  const recent = Object.entries(allRequests).slice(-5).reverse();
+  if (!recent.length) { el.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--text2);">Koi request nahi</div>`; return; }
+  el.innerHTML = recent.map(([id,r],i) => `
+    <div class="table-row tbl-req anim" style="animation-delay:${i*0.05}s">
+      <div class="cell-name">${esc(r.name||'—')}</div>
+      <div class="cell-mono">${esc(r.phone||'—')}</div>
+      <div class="cell-label">${esc(r.city||'—')}</div>
+      <div><span class="badge ${r.status==='approved'?'badge-paid':r.status==='pending'?'badge-pending':'badge-blocked'}">${r.status||'pending'}</span></div>
+      <div class="actions">
+        ${r.status==='pending'?`<button class="btn btn-green btn-sm" onclick="approveRequest('${id}')">✅ Approve</button><button class="btn btn-red btn-sm" onclick="rejectRequest('${id}')">❌ Reject</button>`:'<span style="color:var(--text3);font-size:0.8rem;">Done</span>'}
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateNavBadges() {
+  const pending = Object.values(allRequests).filter(r=>r.status==='pending').length;
+  const badge   = document.getElementById('reqBadge');
+  badge.style.display = pending > 0 ? 'flex' : 'none';
+  badge.textContent   = pending;
+}
+
+// ── RESELLERS ─────────────────────────────────────────────────
+function renderResellers() {
+  const el = document.getElementById('resellerList');
+  const entries = Object.entries(allResellers);
+  if (!entries.length) { el.innerHTML=`<div style="text-align:center;padding:2rem;color:var(--text2);">Koi reseller nahi. ➕ Add karein.</div>`; return; }
+  el.innerHTML = entries.map(([rid,r],i) => {
+    const clientCount = Object.values(allClients).filter(c=>c.reseller_id===rid).length;
+    const active = r.active !== false;
+    return `<div class="table-row tbl-res anim" style="animation-delay:${i*0.04}s">
+      <div class="cell-name">${esc(r.name||'—')}</div>
+      <div class="cell-mono">${esc(r.number||'—')}</div>
+      <div>${clientCount}</div>
+      <div class="hide-sm"><span class="badge ${active?'badge-paid':'badge-blocked'}">${active?'Active':'Disabled'}</span></div>
+      <div class="hide-sm" style="font-size:0.75rem;color:var(--text2);">${timeAgo(r.created_at)}</div>
+      <div class="actions">
+        <button class="btn btn-outline btn-sm" onclick="chatWithReseller('${rid}','${esc(r.name||rid)}')">💬</button>
+        <button class="btn ${active?'btn-red':'btn-green'} btn-sm" onclick="toggleReseller('${rid}',${active})">${active?'Block':'Enable'}</button>
+        <button class="btn btn-red btn-sm" onclick="deleteReseller('${rid}','${esc(r.name||'')}')">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── REQUESTS ─────────────────────────────────────────────────
+function renderRequests() {
+  const el = document.getElementById('requestList');
+  const entries = Object.entries(allRequests);
+  if (!entries.length) { el.innerHTML=`<div style="text-align:center;padding:2rem;color:var(--text2);">Koi request nahi</div>`; return; }
+  el.innerHTML = entries.reverse().map(([id,r],i) => `
+    <div class="table-row tbl-req anim" style="animation-delay:${i*0.05}s">
+      <div class="cell-name">${esc(r.name||'—')}</div>
+      <div class="cell-mono">${esc(r.phone||'—')}</div>
+      <div>${esc(r.city||'—')}</div>
+      <div><span class="badge ${r.status==='approved'?'badge-paid':r.status==='pending'?'badge-pending':'badge-blocked'}">${r.status}</span></div>
+      <div class="actions">
+        ${r.status==='pending'
+          ? `<button class="btn btn-green btn-sm" onclick="approveRequest('${id}')">✅ Approve</button>
+             <button class="btn btn-red btn-sm" onclick="rejectRequest('${id}')">❌ Reject</button>`
+          : `<span style="color:var(--text3);font-size:0.78rem;">${formatTs(r.requested_at)}</span>`}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── APPROVE REQUEST ───────────────────────────────────────────
+window.approveRequest = async function(id) {
+  const r = allRequests[id];
+  if (!r) return;
+  const rid = genUID('RES');
+  try {
+    await set(ref(db,`resellers/${rid}`), {
+      name: r.name, number: r.phone, password: r.password,
+      city: r.city, active: true, created_at: Date.now()
+    });
+    await update(ref(db,`reseller_requests/${id}`), { status:'approved', reseller_id: rid, approved_at: Date.now() });
+    playSound('success');
+    showToast(`✅ ${r.name} approve ho gaya! ID: ${rid}`, 'success', 5000);
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+};
+
+window.rejectRequest = async function(id) {
+  if (!confirm('Yeh request reject karein?')) return;
+  await update(ref(db,`reseller_requests/${id}`), { status:'rejected' });
+  showToast('Request reject ho gayi.', 'info');
+};
+
+// ── ADD RESELLER ──────────────────────────────────────────────
+window.addReseller = async function() {
+  const name  = document.getElementById('ar-name').value.trim();
+  const phone = document.getElementById('ar-phone').value.trim();
+  const city  = document.getElementById('ar-city').value.trim();
+  const pass  = document.getElementById('ar-pass').value.trim();
+  const errEl = document.getElementById('addResError');
+  const btn   = document.getElementById('addResBtn');
+
+  if (!name || !phone || !pass) { errEl.textContent='Naam, phone aur password zaroori.'; errEl.style.display='block'; return; }
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span>';
+
+  try {
+    const rid = genUID('RES');
+    await set(ref(db,`resellers/${rid}`),{ name, number:phone, city, password:pass, active:true, created_at:Date.now() });
+    playSound('deploy'); showToast(`✅ Reseller ${name} add ho gaya! ID: ${rid}`, 'success', 5000);
+    closeModal('addResellerModal');
+    ['ar-name','ar-phone','ar-city','ar-pass'].forEach(i=>document.getElementById(i).value='');
+    errEl.style.display='none';
+  } catch(e) { errEl.textContent='Error: '+e.message; errEl.style.display='block'; }
+  btn.disabled=false; btn.innerHTML='✅ Add Karein';
+};
+
+// ── TOGGLE / DELETE RESELLER ──────────────────────────────────
+window.toggleReseller = async function(rid, currentlyActive) {
+  await update(ref(db,`resellers/${rid}`), { active: !currentlyActive });
+  showToast(`Reseller ${currentlyActive?'disable':'enable'} ho gaya.`, 'info');
+};
+
+window.deleteReseller = async function(rid, name) {
+  if (!confirm(`${name || rid} ko delete karein? Unke clients remain rahenge.`)) return;
+  await remove(ref(db,`resellers/${rid}`));
+  playSound('error'); showToast(`${name} delete ho gaya.`, 'warn');
+};
+
+// ── ALL CLIENTS ───────────────────────────────────────────────
+function renderAdminClients(filter='') {
+  const el = document.getElementById('adminClientList');
+  let entries = Object.entries(allClients);
+  if (filter) entries = entries.filter(([uid,c]) =>
+    (c.name||'').toLowerCase().includes(filter) ||
+    (c.phone||'').toLowerCase().includes(filter) ||
+    uid.toLowerCase().includes(filter)
+  );
+  if (!entries.length) { el.innerHTML=`<div style="text-align:center;padding:2rem;color:var(--text2);">Koi client nahi mila</div>`; return; }
+  el.innerHTML = entries.slice(0,50).map(([uid,c],i)=>`
+    <div class="table-row tbl-cli anim" style="animation-delay:${i*0.03}s">
+      <div class="cell-name">${esc(c.name||'—')}</div>
+      <div class="cell-mono">${esc(c.phone||'—')}</div>
+      <div class="cell-mono" style="font-size:0.72rem;">${uid}</div>
+      <div><span class="badge ${c.status==='Paid'?'badge-paid':'badge-blocked'}">${c.status||'—'}</span></div>
+      <div class="actions">
+        <button class="btn btn-outline btn-sm" onclick="toggleAdminClient('${uid}','${c.status}','${c.reseller_id||''}')">
+          ${c.status==='Paid'?'🔴 Block':'🟢 Unblock'}
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.filterAdminClients = function() {
+  renderAdminClients(document.getElementById('clientSearch').value.toLowerCase());
+};
+
+window.toggleAdminClient = async function(uid, status, rid) {
+  const newStatus = status==='Paid'?'Blocked':'Paid';
+  await update(ref(db,`master_users/${uid}`), {status:newStatus, updated_at:Date.now()});
+  if (rid) await update(ref(db,`clients/${rid}/${uid}`), {status:newStatus});
+  showToast(`${uid} ab ${newStatus} hai`, 'success');
+};
+
+// ── LIBRARY ───────────────────────────────────────────────────
+function renderLibrary() {
+  const el = document.getElementById('libraryList');
+  const entries = Object.entries(allLibrary);
+  if (!entries.length) { el.innerHTML=`<div style="text-align:center;padding:2rem;color:var(--text2);">Library empty hai. Sources add karein.</div>`; return; }
+  el.innerHTML = entries.map(([key,item],i)=>`
+    <div class="table-row anim" style="grid-template-columns:1.5fr 2fr 1fr;animation-delay:${i*0.04}s">
+      <div class="cell-name">${esc(item.name||'—')}</div>
+      <div class="cell-mono" style="word-break:break-all;">${esc(item.url||'—')}</div>
+      <div class="actions">
+        <button class="btn btn-outline btn-sm" onclick="copyTxt('${esc(item.url||'')}')">📋</button>
+        <button class="btn btn-red btn-sm" onclick="delLibSource('${key}')">🗑</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.addLibSource = async function() {
+  const name = document.getElementById('lib-name').value.trim();
+  const url  = document.getElementById('lib-url').value.trim();
+  if (!name||!url) { showToast('Naam aur URL zaroori.','warn'); return; }
+  await push(ref(db,'playlist_library'),{name,url,added:Date.now()});
+  playSound('success'); showToast('Source add ho gaya! ✅','success');
+  closeModal('addLibModal');
+  document.getElementById('lib-name').value=''; document.getElementById('lib-url').value='';
+};
+
+window.delLibSource = async function(key) {
+  if (!confirm('Source delete karein?')) return;
+  await remove(ref(db,`playlist_library/${key}`));
+  showToast('Source delete ho gaya.','info');
+};
+
+// ── CHAT SYSTEM ───────────────────────────────────────────────
+function loadChatList() {
+  onValue(ref(db,'resellers'), snap => {
+    const res = snap.val() || {};
+    const el  = document.getElementById('chatList');
+    if (!Object.keys(res).length) { el.innerHTML=`<div style="text-align:center;padding:2rem;color:var(--text2);font-size:0.82rem;">Koi reseller nahi</div>`; return; }
+    el.innerHTML = Object.entries(res).map(([rid,r])=>`
+      <div class="chat-list-item ${chatWith===rid?'active':''}" onclick="selectChat('${rid}','${esc(r.name||rid)}','${r.active!==false?'online':'offline'}')">
+        <div class="chat-list-avatar">🧑‍💼</div>
+        <div style="flex:1;overflow:hidden;">
+          <div class="chat-list-name">${esc(r.name||rid)}</div>
+          <div class="chat-list-last">${esc(r.number||'—')}</div>
+        </div>
+      </div>
+    `).join('');
+  });
+}
+
+window.selectChat = function(rid, name) {
+  chatWith = rid;
+  document.getElementById('chatWithName').textContent = name;
+  document.getElementById('chatWithId').textContent   = rid;
+
+  // Remove old listener
+  if (chatListener) off(ref(db,`chats/${chatListener}`));
+  chatListener = rid;
+
+  const msgEl = document.getElementById('adminChatMessages');
+  msgEl.innerHTML = '';
+
+  // Realtime messages
+  onValue(ref(db,`chats/${rid}`), snap => {
+    const msgs = snap.val() || {};
+    msgEl.innerHTML = '';
+    Object.values(msgs).sort((a,b)=>a.ts-b.ts).forEach(m => {
+      const isSelf = m.from === 'admin';
+      const div = document.createElement('div');
+      div.className = `chat-msg ${isSelf?'self':''}`;
+      div.innerHTML = `
+        <div class="chat-avatar ${isSelf?'avatar-admin':'avatar-user'}">${isSelf?'👑':'🧑‍💼'}</div>
+        <div>
+          <div class="chat-bubble">${esc(m.text).replace(/\n/g,'<br>')}</div>
+          <div class="chat-meta">${isSelf?'Muaaz':'Reseller'} · ${timeAgo(m.ts)}</div>
+        </div>`;
+      msgEl.appendChild(div);
+    });
+    msgEl.scrollTop = msgEl.scrollHeight;
+  });
+
+  // Refresh chat list highlight
+  document.querySelectorAll('.chat-list-item').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.chat-list-item').forEach(el=>{
+    if(el.getAttribute('onclick')?.includes(`'${rid}'`)) el.classList.add('active');
+  });
+  goPage('chat',{chat:'CHAT'});
+};
+
+window.chatWithReseller = window.selectChat;
+
+window.sendAdminMessage = async function() {
+  if (!chatWith) { showToast('Pehle reseller select karein.','warn'); return; }
+  const input = document.getElementById('adminChatInput');
+  const text  = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  playSound('send');
+  await push(ref(db,`chats/${chatWith}`), { text, from:'admin', ts: Date.now() });
+};
+
+window.handleAdminChatKey = function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAdminMessage(); }
+};
+
+// ── AI ────────────────────────────────────────────────────────
+window.sendAdminAI = async function() {
+  const input = document.getElementById('adminAiInput');
+  const text  = input.value.trim();
+  if (!text) return;
+  input.value = '';
+
+  const msgEl = document.getElementById('adminAiMessages');
+  const addMsg = (t, role) => {
+    const d=document.createElement('div');
+    d.className=`chat-msg ${role==='admin'?'self':''}`;
+    d.innerHTML=`<div class="chat-avatar ${role==='admin'?'avatar-admin':'avatar-ai'}">${role==='admin'?'👑':'🧠'}</div><div class="chat-bubble">${esc(t).replace(/\n/g,'<br>')}</div>`;
+    msgEl.appendChild(d); msgEl.scrollTop=msgEl.scrollHeight;
+  };
+
+  addMsg(text,'admin'); playSound('send');
+  adminAiHistory.push({role:'user',content:text});
+
+  // Thinking
+  const thinkId='think_'+Date.now();
+  const thinkEl=document.createElement('div');
+  thinkEl.id=thinkId; thinkEl.className='chat-msg';
+  thinkEl.innerHTML=`<div class="chat-avatar avatar-ai">🧠</div><div class="chat-bubble"><div class="thinking-dots"><span></span><span></span><span></span></div></div>`;
+  msgEl.appendChild(thinkEl); msgEl.scrollTop=msgEl.scrollHeight;
+
+  const response = await groqChat(adminAiHistory);
+  document.getElementById(thinkId)?.remove();
+
+  adminAiHistory.push({role:'assistant',content:response});
+  if(adminAiHistory.length>24) adminAiHistory=adminAiHistory.slice(-24);
+  addMsg(response,'ai'); playSound('receive');
+};
+
+window.clearAdminAI = function() {
+  adminAiHistory=[];
+  document.getElementById('adminAiMessages').innerHTML=`<div class="chat-msg"><div class="chat-avatar avatar-ai">🧠</div><div class="chat-bubble">Chat clear! Naya sawal poochhein 😊</div></div>`;
+};
+
+// ── NAVIGATION ────────────────────────────────────────────────
+const pageTitles = { dashboard:'Dashboard', resellers:'Resellers', requests:'Join Requests', clients:'All Clients', chat:'Chat', library:'Library', ai:'MI AI', analytics:'Analytics' };
+
+window.goPage = function(name) {
+  playSound('nav');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name)?.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{if(n.dataset.page===name)n.classList.add('active');});
+  document.getElementById('pageTitle').textContent=(pageTitles[name]||name).toUpperCase();
+  closeSidebar();
+};
+
+// ── SIDEBAR MOBILE ────────────────────────────────────────────
+window.openSidebar  = ()=>{ document.getElementById('sidebar').classList.add('open'); document.getElementById('sidebarBg').classList.add('show'); };
+window.closeSidebar = ()=>{ document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarBg').classList.remove('show'); };
+
+// ── LOGOUT ────────────────────────────────────────────────────
+window.logout = function() {
+  playSound('logout');
+  localStorage.removeItem('mitv_session');
+  window.location.href='index.html';
+};
+
+// ── COPY ──────────────────────────────────────────────────────
+window.copyTxt = function(t) {
+  navigator.clipboard.writeText(t).then(()=>showToast('Copied! 📋','success',2000));
+};
+
+// ── UTILS ─────────────────────────────────────────────────────
+window.openModal  = id => { playSound('click'); document.getElementById(id)?.classList.add('show'); };
+window.closeModal = id => document.getElementById(id)?.classList.remove('show');
+</script>
+</body>
+</html>
