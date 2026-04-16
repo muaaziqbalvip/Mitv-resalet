@@ -1,14 +1,9 @@
 /* ============================================================
-   MITV NETWORK — Firebase Config + Core Utilities
-   Project: MUSLIM ISLAM | Founder: Muaaz Iqbal (Kasur)
-   ============================================================
-
-   SETUP: Firebase config apni project ki values se replace karo
-   Firebase Console → Project Settings → Web App → Config
+   MITV NETWORK v4.0 — Firebase Config + Utilities
+   MUSLIM ISLAM | Muaaz Iqbal (Kasur, Punjab)
    ============================================================ */
 
-// ── FIREBASE CONFIG ─────────────────────────────────────────
-// ⚠️ APNI CONFIG YAHAN DAALO — console.firebase.google.com
+// ⚠️ Replace with your Firebase Console values
 export const firebaseConfig = {
   apiKey:            "YOUR_FIREBASE_API_KEY",
   authDomain:        "ramadan-2385b.firebaseapp.com",
@@ -19,201 +14,118 @@ export const firebaseConfig = {
   appId:             "YOUR_APP_ID"
 };
 
-// ── GROQ API KEYS (3 keys — auto rotation) ─────────────────
-// Keys rotate automatically if one hits rate limit
-export const GROQ_KEYS = [
-  "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",
-  // Add 2nd key here:  "gsk_...",
-  // Add 3rd key here:  "gsk_...",
-];
+export const GROQ_KEYS  = ["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"];
 export const GROQ_MODEL  = "llama3-70b-8192";
-export const GROQ_MODEL2 = "llama3-8b-8192"; // ultra-fast fallback
+export const GROQ_MODEL2 = "llama3-8b-8192";
 
-// ── APP CONSTANTS ───────────────────────────────────────────
-export const VERCEL_BASE    = "https://mitv-tan.vercel.app/api/m3u?user=";
-export const APP_LINK       = "https://mitvnet.vercel.app/mitvnet.apk";
-export const LOGO_URL       = "https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png";
-export const ADMIN_PIN      = "1234"; // Change this! Admin PIN lock
-export const RESELLER_PIN   = "0000"; // Default reseller PIN (each reseller sets own)
+export const APP_LINK  = "https://mitvnet.vercel.app/mitvnet.apk";
+export const LOGO_URL  = "https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png";
+export const ADMIN_PIN = "1234";
 
-// ── PRICING CONFIG ──────────────────────────────────────────
-export const PRICING = {
-  monthly_rs: 300,   // Rs per client per month
-  setup_rs:   100,   // One-time setup per client
-};
+export const PRICING = { monthly: 300, setup: 100 };
 
-// ── Toast Utility ───────────────────────────────────────────
-export function showToast(msg, type = 'info', duration = 3500) {
-  let container = document.getElementById('toastContainer');
-  if (!container) {
-    container = document.createElement('div');
-    container.id = 'toastContainer';
-    document.body.appendChild(container);
-  }
+/* ── Toast ── */
+export function showToast(msg, type='info', ms=3400) {
+  let box = document.getElementById('toastBox');
+  if (!box) { box=document.createElement('div'); box.id='toastBox'; document.body.appendChild(box); }
   const t = document.createElement('div');
   t.className = `toast ${type}`;
-  const icons = { success:'✅', error:'❌', info:'ℹ️', warn:'⚠️' };
-  t.innerHTML = `<span>${icons[type]||'•'}</span> <span>${msg}</span>`;
-  container.appendChild(t);
-  playSound('notify');
-  setTimeout(() => { t.classList.add('removing'); setTimeout(() => t.remove(), 350); }, duration);
+  const ico = {success:'✅',error:'❌',info:'ℹ️',warn:'⚠️'};
+  t.innerHTML = `<span>${ico[type]||'•'}</span><span style="flex:1">${msg}</span>`;
+  box.appendChild(t);
+  if (typeof playSound!=='undefined') try{playSound('notify')}catch(e){}
+  const close = () => { t.classList.add('out'); setTimeout(()=>t.remove(),300); };
+  const tid = setTimeout(close, ms);
+  t.onclick = () => { clearTimeout(tid); close(); };
 }
 
-// ── Escape HTML ─────────────────────────────────────────────
-export function esc(str) {
-  const d = document.createElement('div');
-  d.appendChild(document.createTextNode(String(str || '')));
+/* ── Escape ── */
+export function esc(s) {
+  const d=document.createElement('div');
+  d.appendChild(document.createTextNode(String(s||'')));
   return d.innerHTML;
 }
 
-// ── Format timestamp ─────────────────────────────────────────
+/* ── Format timestamp ── */
 export function formatTs(ms) {
   if (!ms) return '—';
-  try {
-    return new Date(ms).toLocaleString('en-PK', {
-      day:'2-digit', month:'short', year:'numeric',
-      hour:'2-digit', minute:'2-digit', hour12:true
-    });
-  } catch { return '—'; }
+  try { return new Date(ms).toLocaleString('en-PK',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true}); }
+  catch { return '—'; }
 }
 
-// ── Short time ago ──────────────────────────────────────────
+/* ── Time ago ── */
 export function timeAgo(ms) {
   if (!ms) return '—';
-  const diff = Date.now() - ms;
-  const m = Math.floor(diff / 60000);
-  const h = Math.floor(diff / 3600000);
-  const d = Math.floor(diff / 86400000);
-  if (m < 1)  return 'Abhi abhi';
-  if (m < 60) return `${m} min pehle`;
-  if (h < 24) return `${h} ghante pehle`;
-  return `${d} din pehle`;
+  const diff=Date.now()-ms, m=Math.floor(diff/60000), h=Math.floor(diff/3600000), d=Math.floor(diff/86400000);
+  if (m<1) return 'Abhi abhi';
+  if (m<60) return `${m}m pehle`;
+  if (h<24) return `${h}h pehle`;
+  if (d<30) return `${d}d pehle`;
+  return formatTs(ms);
 }
 
-// ── Generate UID ─────────────────────────────────────────────
-export function genUID(prefix = 'MITV') {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let result = '';
-  for (let i = 0; i < 5; i++) result += chars[Math.floor(Math.random() * chars.length)];
-  return `${prefix}-${result}`;
+/* ── UID generator ── */
+export function genUID(pre='MITV') {
+  const c='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  return pre+'-'+Array.from({length:6},()=>c[Math.floor(Math.random()*c.length)]).join('');
 }
 
-// ── Copy to clipboard ────────────────────────────────────────
-export function copyText(text, btnEl = null) {
-  navigator.clipboard.writeText(text).then(() => {
-    showToast('Clipboard mein copy ho gaya! 📋', 'success', 2000);
-    if (btnEl) {
-      const orig = btnEl.innerHTML;
-      btnEl.innerHTML = '✅ Copied!';
-      btnEl.classList.add('copied');
-      setTimeout(() => { btnEl.innerHTML = orig; btnEl.classList.remove('copied'); }, 2000);
-    }
-  }).catch(() => {
-    // Fallback
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed'; ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.focus(); ta.select();
-    document.execCommand('copy');
-    ta.remove();
-    showToast('Copied! 📋', 'success', 2000);
-  });
+/* ── Copy text ── */
+export function copyText(text, btn=null) {
+  const done = () => {
+    showToast('Copied! 📋','success',2000);
+    if (btn) { const o=btn.innerHTML; btn.innerHTML='✅ Copied!'; btn.classList.add('copied'); setTimeout(()=>{btn.innerHTML=o;btn.classList.remove('copied')},2000); }
+  };
+  if (navigator.clipboard) navigator.clipboard.writeText(text).then(done).catch(()=>fallback());
+  else fallback();
+  function fallback(){const t=document.createElement('textarea');t.value=text;t.style='position:fixed;opacity:0';document.body.appendChild(t);t.focus();t.select();document.execCommand('copy');t.remove();done();}
 }
 
-// ── Modal Controls ───────────────────────────────────────────
-export function openModal(id)  { document.getElementById(id)?.classList.add('show'); }
+/* ── Modal ── */
+export function openModal(id)  { document.getElementById(id)?.classList.add('show'); try{playSound('click')}catch(e){} }
 export function closeModal(id) { document.getElementById(id)?.classList.remove('show'); }
 
-// ── Show / Hide Page ─────────────────────────────────────────
-export function showPage(name, titles = {}) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  const page = document.getElementById(`page-${name}`);
-  if (page) { page.classList.add('active'); page.style.animation = 'none'; page.offsetHeight; page.style.animation = ''; }
-  document.querySelectorAll('.nav-item').forEach(n => {
-    if (n.dataset.page === name) n.classList.add('active');
-  });
-  const t = document.getElementById('pageTitle');
-  if (t) t.textContent = (titles[name] || name).toUpperCase();
+/* ── Clock ── */
+export function startClock(id='clock') {
+  const el=document.getElementById(id); if(!el) return;
+  const t=()=>{ el.textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true}); };
+  t(); return setInterval(t,1000);
 }
 
-// ── Live Clock ───────────────────────────────────────────────
-export function startClock(elId = 'clockBadge') {
-  const el = document.getElementById(elId);
-  if (!el) return;
-  const tick = () => {
-    const now = new Date();
-    el.textContent = now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true });
-  };
-  tick(); return setInterval(tick, 1000);
+/* ── WA activation post ── */
+export function waPost(name,phone,m3u,uid) {
+  return `🌟 *MITV NETWORK* 🌟\n🚀 *Account Activation!* 🚀\n\nAssalam o Alaikum! ✨\n*${name}*, aapka MITV account active ho gaya! 🎉\n\n📝 *Details:*\n👤 Name   : ${name}\n📞 Number : ${phone}\n🆔 UID    : ${uid}\n🔗 M3U:\n${m3u}\n\n📲 App: ${APP_LINK}\n\n🏢 MUSLIM ISLAM\n👑 Muaaz Iqbal (Kasur, Punjab)\n\nShukriya! ❤️`;
 }
 
-// ── WhatsApp activation post generator ──────────────────────
-export function generateActivationPost(name, phone, m3u, uid) {
-  return `🌟 MITV NETWORK 🌟
-🚀 Account Activation Successful! 🚀
-
-Assalam o Alaikum! ✨
-*${name}*, aapka MITV account active ho gaya! 🎉
-
-📝 Account Details:
-👤 Name   : ${name}
-📞 Number : ${phone}
-🆔 UID    : ${uid}
-🔗 M3U Link:
-${m3u}
-
-📲 App Download:
-${APP_LINK}
-
-🏢 Project Of: MUSLIM ISLAM
-👑 Founder: Muaaz Iqbal (Kasur, Punjab, Pakistan)
-
-Humse judne ka shukriya! ❤️
-Koi masla ho to rabta karein.`;
+/* ── Revenue ── */
+export function revenue(clients={}) {
+  const v=Object.values(clients);
+  const paid=v.filter(c=>c.status==='Paid').length;
+  const total=Object.keys(clients).length;
+  return { paid, blocked:total-paid, total, monthly:paid*PRICING.monthly, setup:total*PRICING.setup, earned:(paid*PRICING.monthly)+(total*PRICING.setup) };
 }
 
-// ── Cost Calculator ─────────────────────────────────────────
-export function calcRevenue(clients = {}) {
-  const paid    = Object.values(clients).filter(c => c.status === 'Paid').length;
-  const blocked = Object.values(clients).filter(c => c.status === 'Blocked').length;
-  const total   = Object.keys(clients).length;
-  const monthly = paid * PRICING.monthly_rs;
-  const setup   = total * PRICING.setup_rs;
-  const total_earned = monthly + setup;
-  return { paid, blocked, total, monthly, setup, total_earned };
-}
-
-// ── PWA: Register Service Worker ────────────────────────────
-export function registerSW() {
+/* ── SW Register ── */
+export function regSW() {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').then(reg => {
-      console.log('[PWA] SW registered:', reg.scope);
-    }).catch(err => console.warn('[PWA] SW failed:', err));
-  }
-}
-
-// ── PWA: Install prompt ──────────────────────────────────────
-let deferredPrompt = null;
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredPrompt = e;
-  const banner = document.getElementById('pwaBanner');
-  if (banner) setTimeout(() => banner.classList.add('show'), 3000);
-});
-
-export function installPWA() {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(result => {
-      if (result.outcome === 'accepted') showToast('✅ MITV App install ho gaya!', 'success');
-      deferredPrompt = null;
-      const banner = document.getElementById('pwaBanner');
-      if (banner) banner.classList.remove('show');
+    window.addEventListener('load',()=>{
+      navigator.serviceWorker.register('/sw.js')
+        .then(r=>console.log('[SW]',r.scope))
+        .catch(e=>console.warn('[SW]',e));
     });
   }
 }
 
-// ── Expose install to global scope ──────────────────────────
-window.installPWA = installPWA;
+/* ── PWA Install ── */
+let _prompt=null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault(); _prompt=e;
+  setTimeout(()=>document.getElementById('pwaBanner')?.classList.add('show'), 4000);
+});
+window.addEventListener('appinstalled',()=>showToast('✅ MITV App installed!','success',4000));
+
+export function installPWA() {
+  if (_prompt) { _prompt.prompt(); _prompt.userChoice.then(r=>{ if(r.outcome==='accepted') showToast('✅ Installing...','success'); _prompt=null; document.getElementById('pwaBanner')?.classList.remove('show'); }); }
+  else showToast('ℹ️ Already installed or not supported','info');
+}
+window.installPWA=installPWA;

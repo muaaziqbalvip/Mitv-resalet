@@ -1,164 +1,25 @@
-/* ============================================================
-   MITV NETWORK — Sound Effects (Web Audio API)
-   Beautiful click sounds, notifications, success/error tones
-   ============================================================ */
-
-let audioCtx = null;
-let soundEnabled = true;
-
-// Lazy init AudioContext on first user interaction
-function getCtx() {
-  if (!audioCtx) {
-    try {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    } catch (e) {
-      return null;
-    }
-  }
-  if (audioCtx.state === 'suspended') audioCtx.resume();
-  return audioCtx;
-}
-
-// ── Core tone generator ──────────────────────────────────────
-function playTone(freq, type = 'sine', duration = 0.1, gain = 0.3, delay = 0) {
-  if (!soundEnabled) return;
-  const ctx = getCtx();
-  if (!ctx) return;
-
-  const osc  = ctx.createOscillator();
-  const gainN = ctx.createGain();
-
-  osc.connect(gainN);
-  gainN.connect(ctx.destination);
-
-  osc.type      = type;
-  osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
-
-  gainN.gain.setValueAtTime(0, ctx.currentTime + delay);
-  gainN.gain.linearRampToValueAtTime(gain, ctx.currentTime + delay + 0.01);
-  gainN.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + duration);
-
-  osc.start(ctx.currentTime + delay);
-  osc.stop(ctx.currentTime + delay + duration + 0.05);
-}
-
-// ── Sound definitions ────────────────────────────────────────
-const SOUNDS = {
-
-  // Crisp button click
-  click: () => {
-    playTone(800, 'sine',     0.05, 0.2);
-    playTone(600, 'sine',     0.05, 0.12, 0.03);
-  },
-
-  // Softer nav/menu click
-  nav: () => {
-    playTone(500, 'sine',     0.08, 0.15);
-    playTone(700, 'triangle', 0.06, 0.08, 0.04);
-  },
-
-  // Success — ascending chime
-  success: () => {
-    playTone(523, 'sine',  0.12, 0.25);
-    playTone(659, 'sine',  0.12, 0.25, 0.1);
-    playTone(784, 'sine',  0.15, 0.3,  0.2);
-    playTone(1047,'sine',  0.12, 0.2,  0.33);
-  },
-
-  // Error — descending low tone
-  error: () => {
-    playTone(300, 'sawtooth', 0.12, 0.2);
-    playTone(220, 'sawtooth', 0.15, 0.25, 0.1);
-  },
-
-  // Notification ping
-  notify: () => {
-    playTone(880, 'sine',     0.08, 0.2);
-    playTone(1100,'sine',     0.1,  0.18, 0.06);
-  },
-
-  // PIN key press
-  pin: () => {
-    playTone(700 + Math.random()*200, 'triangle', 0.06, 0.18);
-  },
-
-  // PIN confirmed
-  pinOk: () => {
-    playTone(784, 'sine', 0.1, 0.25);
-    playTone(988, 'sine', 0.1, 0.25, 0.1);
-  },
-
-  // PIN wrong
-  pinWrong: () => {
-    playTone(200, 'sawtooth', 0.15, 0.3);
-    playTone(150, 'sawtooth', 0.12, 0.25, 0.12);
-  },
-
-  // Message sent
-  send: () => {
-    playTone(600, 'sine', 0.08, 0.18);
-    playTone(900, 'sine', 0.06, 0.15, 0.07);
-  },
-
-  // Logout / close
-  logout: () => {
-    playTone(400, 'triangle', 0.15, 0.2);
-    playTone(300, 'triangle', 0.12, 0.15, 0.1);
-  },
-
-  // Deploy / create
-  deploy: () => {
-    [0, 0.08, 0.16, 0.26].forEach((d, i) => {
-      playTone([440, 550, 660, 880][i], 'sine', 0.1, 0.2, d);
-    });
-  },
-
-  // Hover subtle
-  hover: () => {
-    playTone(1000, 'sine', 0.03, 0.08);
-  },
-
-  // Message received
-  receive: () => {
-    playTone(880, 'sine',  0.07, 0.15);
-    playTone(1100,'sine',  0.05, 0.12, 0.08);
-  }
+/* MITV — Sound Effects (Web Audio API) */
+let audioCtx=null,soundOn=true;
+function getCtx(){if(!audioCtx){try{audioCtx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){return null}}if(audioCtx.state==='suspended')audioCtx.resume();return audioCtx}
+function tone(freq,type='sine',dur=.1,gain=.28,delay=0){if(!soundOn)return;const ctx=getCtx();if(!ctx)return;const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type=type;o.frequency.setValueAtTime(freq,ctx.currentTime+delay);g.gain.setValueAtTime(0,ctx.currentTime+delay);g.gain.linearRampToValueAtTime(gain,ctx.currentTime+delay+.01);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+delay+dur);o.start(ctx.currentTime+delay);o.stop(ctx.currentTime+delay+dur+.05)}
+const SFX={
+  click:()=>{tone(800,'sine',.05,.2);tone(600,'sine',.05,.12,.03)},
+  nav:()=>{tone(500,'sine',.08,.15);tone(700,'triangle',.06,.08,.04)},
+  success:()=>{tone(523,'sine',.12,.25);tone(659,'sine',.12,.25,.1);tone(784,'sine',.15,.3,.2);tone(1047,'sine',.12,.2,.33)},
+  error:()=>{tone(300,'sawtooth',.12,.2);tone(220,'sawtooth',.15,.25,.1)},
+  notify:()=>{tone(880,'sine',.08,.2);tone(1100,'sine',.1,.18,.06)},
+  pin:()=>{tone(700+Math.random()*200,'triangle',.06,.18)},
+  pinOk:()=>{tone(784,'sine',.1,.25);tone(988,'sine',.1,.25,.1)},
+  pinWrong:()=>{tone(200,'sawtooth',.15,.3);tone(150,'sawtooth',.12,.25,.12)},
+  send:()=>{tone(600,'sine',.08,.18);tone(900,'sine',.06,.15,.07)},
+  logout:()=>{tone(400,'triangle',.15,.2);tone(300,'triangle',.12,.15,.1)},
+  deploy:()=>{[0,.08,.16,.26].forEach((d,i)=>tone([440,550,660,880][i],'sine',.1,.2,d))},
+  receive:()=>{tone(880,'sine',.07,.15);tone(1100,'sine',.05,.12,.08)}
 };
-
-// ── Public play function ─────────────────────────────────────
-window.playSound = function(name) {
-  if (SOUNDS[name]) {
-    try { SOUNDS[name](); } catch(e) {}
-  }
-};
-
-// ── Toggle sound ─────────────────────────────────────────────
-window.toggleSound = function() {
-  soundEnabled = !soundEnabled;
-  const btn = document.getElementById('soundToggle');
-  if (btn) btn.textContent = soundEnabled ? '🔊' : '🔇';
-  showToast(soundEnabled ? '🔊 Sound on' : '🔇 Sound off', 'info', 1500);
-  return soundEnabled;
-};
-
-// ── Auto-attach to all buttons ───────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  // Initialize on first touch/click
-  const initAudio = () => {
-    getCtx();
-    document.removeEventListener('click', initAudio);
-    document.removeEventListener('touchstart', initAudio);
-  };
-  document.addEventListener('click', initAudio);
-  document.addEventListener('touchstart', initAudio);
-
-  // Attach click sounds
-  document.addEventListener('click', e => {
-    const btn = e.target.closest('.btn, button, .nav-item, .pin-key');
-    if (!btn) return;
-    if (btn.classList.contains('pin-key')) return; // handled separately
-    if (btn.classList.contains('btn-gold'))    playSound('click');
-    else if (btn.classList.contains('nav-item')) playSound('nav');
-    else                                         playSound('click');
-  });
+window.playSound=function(n){if(SFX[n])try{SFX[n]()}catch(e){}};
+window.toggleSound=function(){soundOn=!soundOn;const b=document.getElementById('sndBtn');if(b)b.textContent=soundOn?'🔊':'🔇';showToast(soundOn?'🔊 Sound On':'🔇 Sound Off','info',1500);return soundOn};
+document.addEventListener('DOMContentLoaded',()=>{
+  const init=()=>{getCtx();document.removeEventListener('click',init);document.removeEventListener('touchstart',init)};
+  document.addEventListener('click',init);document.addEventListener('touchstart',init,{passive:true});
+  document.addEventListener('click',e=>{const b=e.target.closest('.btn,button,.nav-btn');if(!b||b.classList.contains('pin-key'))return;if(b.classList.contains('btn-gold'))playSound('click');else if(b.classList.contains('nav-btn'))playSound('nav');else playSound('click')});
 });
