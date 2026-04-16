@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Sitemap ka link yahan lazmi dein
+Sitemap: https://mitvresaler.vercel.app/sitemap.xml
