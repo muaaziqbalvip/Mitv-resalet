@@ -1,16 +1,27 @@
 {
   "name": "MITV Network Portal",
   "short_name": "MITV",
-  "description": "MiTV Network Reseller Management Portal by MUSLIM ISLAM",
+  "description": "MITV Network Reseller Management — MUSLIM ISLAM by Muaaz Iqbal",
   "start_url": "/index.html",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#060a12",
+  "background_color": "#05080f",
   "theme_color": "#f0b429",
   "orientation": "portrait-primary",
+  "prefer_related_applications": false,
   "icons": [
-    { "src": "https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png", "sizes": "72x72",  "type": "image/png", "purpose": "any" },
+    { "src": "https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png", "sizes": "96x96",  "type": "image/png", "purpose": "any" },
+    { "src": "https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png", "sizes": "128x128","type": "image/png", "purpose": "any" },
+    { "src": "https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png", "sizes": "144x144","type": "image/png", "purpose": "any" },
+    { "src": "https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png", "sizes": "192x192","type": "image/png", "purpose": "any maskable" },
+    { "src": "https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png", "sizes": "512x512","type": "image/png", "purpose": "any maskable" }
   ],
   "categories": ["business", "productivity"],
-  "lang": "ur"
+  "lang": "ur",
+  "dir": "ltr",
+  "shortcuts": [
+    { "name": "Dashboard", "url": "/dashboard.html", "icons": [{ "src": "https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png", "sizes": "96x96" }] },
+    { "name": "Admin",     "url": "/admin.html",     "icons": [{ "src": "https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png", "sizes": "96x96" }] }
+  ]
 }

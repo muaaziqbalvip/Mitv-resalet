@@ -1,70 +1,19 @@
-/* ============================================================
-   MITV Network PWA — Service Worker
-   Project: MUSLIM ISLAM | Founder: Muaaz Iqbal
-   ============================================================ */
+/* MITV Network v4.0 — Service Worker */
+const CACHE = 'mitv-v4-1';
+const STATIC = ['/index.html','/dashboard.html','/admin.html','/manifest.json','/css/shared.css','/js/firebase-config.js','/js/groq-ai.js','/js/sounds.js'];
 
-const CACHE_NAME   = 'mitv-v3-cache-v1';
-const STATIC_ASSETS = [
-  '/index.html',
-  '/dashboard.html',
-  '/admin.html',
-  '/register.html',
-  '/manifest.json',
-  '/js/firebase-config.js',
-  '/js/groq-ai.js',
-  '/js/sounds.js',
-  '/js/utils.js',
-  '/css/shared.css'
-];
-
-// Install: cache static files
 self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(STATIC_ASSETS).catch(() => {});
-    })
-  );
-  self.skipWaiting();
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(STATIC).catch(()=>{})).then(()=>self.skipWaiting()));
 });
-
-// Activate: clean old caches
 self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-    )
-  );
-  self.clients.claim();
+  e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));
 });
-
-// Fetch: network-first for Firebase, cache-first for assets
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
-
-  // Firebase & external APIs — always network
-  if (url.hostname.includes('firebase') ||
-      url.hostname.includes('googleapis') ||
-      url.hostname.includes('groq') ||
-      url.hostname.includes('anthropic')) {
+  if (url.hostname.includes('firebase')||url.hostname.includes('googleapis')||url.hostname.includes('firebaseio')||url.hostname.includes('groq')||url.hostname.includes('ibb.co')||url.protocol==='chrome-extension:') return;
+  if (e.request.mode==='navigate') {
+    e.respondWith(fetch(e.request).then(r=>{if(r.ok){const c=r.clone();caches.open(CACHE).then(ca=>ca.put(e.request,c))}return r}).catch(()=>caches.match(e.request)||caches.match('/index.html')));
     return;
   }
-
-  // Static assets — cache first, network fallback
-  e.respondWith(
-    caches.match(e.request).then(cached => {
-      if (cached) return cached;
-      return fetch(e.request).then(response => {
-        if (response && response.status === 200) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
-        }
-        return response;
-      }).catch(() => cached);
-    })
-  );
-});
-
-// Background sync placeholder
-self.addEventListener('sync', e => {
-  console.log('[SW] Background sync:', e.tag);
+  e.respondWith(caches.match(e.request).then(cached=>{if(cached)return cached;return fetch(e.request).then(r=>{if(r&&r.ok&&e.request.method==='GET'){const c=r.clone();caches.open(CACHE).then(ca=>ca.put(e.request,c))}return r}).catch(()=>cached)}));
 });
