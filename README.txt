@@ -1,187 +1,135 @@
 ====================================================================
-   MITV NETWORK — WEB PORTAL v3.0 (PWA)
-   Project: MUSLIM ISLAM | Founder: Muaaz Iqbal (Kasur, Punjab)
+  MITV NETWORK PORTAL v5.0 — ULTRA SMOOTH PWA
+  Project: MUSLIM ISLAM | Muaaz Iqbal (Kasur, Punjab, Pakistan)
 ====================================================================
 
-FILES:
-  index.html           — Login + Reseller Registration
-  dashboard.html       — Reseller Full Dashboard
-  admin.html           — Admin Panel (Muaaz Only)
-  manifest.json        — PWA Manifest
-  sw.js                — Service Worker (Offline Support)
-  css/shared.css       — Design System (3D Glassmorphism)
-  js/firebase-config.js — Firebase + Core Utilities
-  js/groq-ai.js        — Groq AI (3-Key Auto Rotation)
-  js/sounds.js         — Click Sounds (Web Audio API)
+FILES (FLAT — NO SUBFOLDERS):
+  index.html      — Login + Reseller Register
+  dashboard.html  — Reseller App (Bottom Nav)
+  admin.html      — Admin Panel (Bottom Nav)
+  manifest.json   — PWA App Manifest
+  sw.js           — Service Worker (Offline)
+  robots.txt      — Google Search Console
+  sitemap.xml     — Google Sitemap
+  README.txt      — Yeh file
 
 ====================================================================
-SETUP — STEP BY STEP
+SETUP — SIRF 2 STEPS
 ====================================================================
 
 STEP 1: FIREBASE CONFIG
-────────────────────────
-js/firebase-config.js mein yeh block update karo:
+─────────────────────────
+Teen files mein yeh replace karo (search: "YOUR_FIREBASE_API_KEY"):
+  index.html, dashboard.html, admin.html
 
-  export const firebaseConfig = {
-    apiKey:            "YOUR_FIREBASE_API_KEY",   ← apna key
-    authDomain:        "ramadan-2385b.firebaseapp.com",
-    databaseURL:       "https://ramadan-2385b-default-rtdb.firebaseio.com",
-    projectId:         "ramadan-2385b",
-    storageBucket:     "ramadan-2385b.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",          ← apna
-    appId:             "YOUR_APP_ID"              ← apna
-  };
+  apiKey:            "YOUR_FIREBASE_API_KEY"   ← apna
+  messagingSenderId: "YOUR_SENDER_ID"           ← apna
+  appId:             "YOUR_APP_ID"              ← apna
 
-Firebase Console → console.firebase.google.com
-  → ramadan-2385b project
-  → Project Settings → General → Your Apps
-  → Web App config copy karo
+Firebase Console: console.firebase.google.com
+  → Project: ramadan-2385b
+  → Settings → General → Your Apps → Web → Config
 
-STEP 2: GROQ API KEY (ALREADY SET)
-────────────────────────────────────
-js/groq-ai.js mein pehle se 1 key hai:
-  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
+STEP 2: VERCEL DEPLOY (FREE)
+──────────────────────────────
+  1. vercel.com par account banao
+  2. New Project → Upload karo yeh sara folder
+  3. Live URL milega instantly
+  4. Done! 🎉
 
-2 aur keys add karne ke liye:
-  export const GROQ_KEYS = [
-    "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",
-    "gsk_...",   ← 2nd key
-    "gsk_...",   ← 3rd key
-  ];
-
-Groq keys: console.groq.com → API Keys
-
-STEP 3: ADMIN PIN
-──────────────────
-js/firebase-config.js mein:
-  export const ADMIN_PIN = "1234";   ← Admin ke liye change karo
-
-STEP 4: PRICING (OPTIONAL)
-────────────────────────────
-js/firebase-config.js mein:
-  export const PRICING = {
-    monthly_rs: 300,   ← Rs per client per month
-    setup_rs:   100,   ← One-time setup per client
-  };
-
-STEP 5: DEPLOY
-──────────────
-Option A — Vercel (BEST FREE):
-  1. vercel.com account banao
-  2. New Project → Upload Folder
-  3. Saari files upload karo
-  4. Live URL milega (e.g. mitv-portal.vercel.app)
-
-Option B — Netlify:
-  1. netlify.com → Sites → Deploy manually
-  2. Folder drag & drop
-  3. Free live URL milega
-
-Option C — Local Testing:
-  VS Code ka "Live Server" extension use karo
-  Ya: python -m http.server 8080
+(Optional) Admin PIN change karo admin.html mein:
+  const ADMIN_PIN="1234";  ← is line pe apna PIN set karo
 
 ====================================================================
-FEATURES — COMPLETE LIST
+GOOGLE SEARCH CONSOLE SETUP
 ====================================================================
 
-LOGIN PAGE (index.html):
-  ✅ Reseller login (Firebase verify)
-  ✅ Reseller registration form (admin approval required)
-  ✅ Session memory — bar bar login nahi
-  ✅ 3D logo animation + gold shimmer
-  ✅ Animated background grid + floating orbs
-  ✅ PWA install prompt
-  ✅ Click sounds
+1. search.google.com/search-console par jao
+2. Property add karo (apna Vercel URL)
+3. Verify karo (HTML tag method)
+4. sitemap.xml submit karo:
+   - Go to Sitemaps section
+   - Enter: sitemap.xml
+   - Click Submit
+5. robots.txt check karo:
+   - apni-site.vercel.app/robots.txt
 
-RESELLER DASHBOARD (dashboard.html):
-  ✅ Stats: Total, Paid, Blocked, Monthly Revenue
-  ✅ Revenue calculator (Rs 300/month × clients)
-  ✅ Real-time client list (Firebase onValue)
-  ✅ Add client — auto UID, Firebase deploy, M3U inject
-  ✅ Client detail modal
-  ✅ Block/Unblock client
-  ✅ Delete client
-  ✅ Copy M3U link
-  ✅ WhatsApp activation message auto-generate
-  ✅ Search clients (naam/phone/uid)
-  ✅ Chat with Admin (Muaaz) — realtime Firebase
-  ✅ MI AI chat (Groq 3-key rotation)
-  ✅ PIN lock security
-  ✅ Session save — no re-login
-  ✅ Mobile responsive + sidebar
-  ✅ Click sounds everywhere
+   ⚠️ sitemap.xml mein apna actual URL daalo:
+   Change "mitvnetwork.vercel.app" → apna actual domain
 
-ADMIN PANEL (admin.html):
-  ✅ PIN lock (4-digit)
-  ✅ Dashboard stats — all resellers, clients, revenue
-  ✅ Revenue estimates
-  ✅ All resellers list
-  ✅ Add reseller manually
-  ✅ Approve/Reject join requests (from index.html register)
-  ✅ Toggle reseller (enable/disable)
-  ✅ Delete reseller
-  ✅ All clients list + search + block/unblock
-  ✅ Real-time chat with each reseller
-  ✅ Playlist library (add/delete M3U sources)
-  ✅ MI AI (admin mode)
-  ✅ Realtime updates (Firebase onValue)
-  ✅ Mobile responsive
+====================================================================
+FEATURES v5.0
+====================================================================
 
-PWA:
-  ✅ manifest.json
-  ✅ Service Worker (offline support)
-  ✅ Install prompt banner
-  ✅ App icon (MITV logo)
-  ✅ Standalone app mode
+PERFORMANCE (No Hang):
+  ✅ GPU-only animations (transform, opacity) — no layout thrash
+  ✅ will-change: transform on animated elements
+  ✅ overscroll-behavior: contain — smooth bounce
+  ✅ -webkit-overflow-scrolling: touch — iOS native feel
+  ✅ Lazy Firebase import — loads only when needed
+  ✅ transform: translateZ(0) — force GPU composite layer
+  ✅ No heavy CSS transitions on scroll
+
+AI (Latest & Fastest):
+  ✅ Groq Model: llama-3.3-70b-versatile (LATEST 2025)
+  ✅ Streaming — words appear instantly as generated
+  ✅ 3-color thinking dots (gold, cyan, purple)
+  ✅ 3-key auto rotation on rate limit
+  ✅ Conversation history (last 14 messages)
 
 DESIGN:
-  ✅ 3D Glassmorphism
-  ✅ Gold + Dark futuristic theme
-  ✅ Orbitron + Exo 2 + Fira Code fonts
-  ✅ Animated background grid + orbs + particles
-  ✅ 3D card hover effects
-  ✅ Smooth page transitions
-  ✅ Staggered list animations
-  ✅ Custom cursor
-  ✅ Click sound feedback (Web Audio API)
-  ✅ Loading ring animation
-  ✅ PIN keypad with sounds
+  ✅ Bottom navigation (app style)
+  ✅ No sidebar at all — zero clutter
+  ✅ Glassmorphism cards (blur + saturation)
+  ✅ Colorful gradient orbs background
+  ✅ Animated logo (3D float + rotateY)
+  ✅ Shimmer text animation
+  ✅ Bottom sheet modals (slide up)
+  ✅ Inter + Orbitron + Fira Code fonts
+  ✅ Click sounds (Web Audio — no files, no lag)
 
-AI:
-  ✅ Groq LLaMA-3 70B (primary)
-  ✅ Groq LLaMA-3 8B (fast fallback)
-  ✅ 3-key auto rotation (rate limit se bachao)
-  ✅ Thinking animation (dots)
-  ✅ Conversation history (last 12 messages)
-  ✅ Custom system prompt (MITV/Muaaz context)
+RESELLER DASHBOARD:
+  ✅ Home: stats, revenue, recent clients
+  ✅ Clients: full list + instant search
+  ✅ Add Client: deploy + cost preview + WA post
+  ✅ Chat: Realtime Firebase with Admin
+  ✅ AI: MI AI streaming chat
+  ✅ About: profile, revenue, PWA install, MITV info
+
+ADMIN PANEL:
+  ✅ Home: stats, revenue, pending requests
+  ✅ Resellers: list, add, block, delete, detail
+  ✅ Requests: approve/reject join requests
+  ✅ Chat: tap reseller name → chat instantly
+  ✅ AI: streaming MI AI
+
+SECURITY:
+  ✅ PIN lock (admin: 1234, reseller: custom)
+  ✅ Session storage (no re-login on refresh)
+  ✅ localStorage session (auto re-login on return)
+
+PWA:
+  ✅ Install banner
+  ✅ Install button in About page
+  ✅ Service Worker (offline)
+  ✅ manifest.json
+
+SEO:
+  ✅ robots.txt (Google crawlable)
+  ✅ sitemap.xml (submit to Search Console)
+  ✅ Meta tags (title, description, OG)
+  ✅ Canonical URLs
+
+FIREBASE NODES USED:
+  /resellers/{RES-ID}        — Reseller accounts
+  /reseller_requests/{id}    — Join requests
+  /clients/{RES-ID}/{UID}    — Client data
+  /master_users/{UID}        — Master user list
+  /active_playlists/{UID}    — M3U engine
+  /playlist_library/{id}     — Global M3U sources
+  /chats/{RES-ID}/{msg-id}   — Chat messages
 
 ====================================================================
-FIREBASE DATABASE NODES USED
-====================================================================
-
-/resellers/{RES-ID}
-  name, number, city, password, active, created_at
-
-/reseller_requests/{push-id}
-  name, phone, city, password, reference, status, requested_at
-
-/clients/{RES-ID}/{MITV-ID}
-  uid, name, phone, m3u, status, time
-
-/master_users/{MITV-ID}
-  name, phone, status, reseller_id, created_at, updated_at
-
-/active_playlists/{MITV-ID}
-  sources[], warningVideo, assigned_by, lastUpdate
-
-/playlist_library/{push-id}
-  name, url, added
-
-/chats/{RES-ID}/{push-id}
-  text, from, ts
-
-====================================================================
-SUPPORT — MUAAZ IQBAL (KASUR, PUNJAB, PAKISTAN)
-Project: MUSLIM ISLAM — MiTV Network
+MUAAZ IQBAL — KASUR, PUNJAB, PAKISTAN
+MUSLIM ISLAM — MiTV Network
 ====================================================================

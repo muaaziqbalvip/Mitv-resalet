@@ -1,215 +1,474 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ur">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="theme-color" content="#f0b429">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MITV">
+<meta name="description" content="MITV Network Reseller Portal — MUSLIM ISLAM, Muaaz Iqbal, Kasur Punjab Pakistan">
+<meta name="keywords" content="MITV Network, IPTV Pakistan, Reseller Portal, Muslim Islam, Muaaz Iqbal">
+<meta name="author" content="Muaaz Iqbal, MUSLIM ISLAM">
+<meta property="og:title" content="MITV Network Portal">
+<meta property="og:description" content="Professional IPTV Reseller Management System">
+<meta property="og:image" content="https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png">
 <title>MITV Network — Login</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png">
-<link rel="stylesheet" href="css/shared.css">
+<link rel="canonical" href="https://mitvnetwork.vercel.app/index.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-.login-wrap{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.4rem;position:relative;z-index:1}
+/* ===== RESET & BASE ===== */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{height:100%;background:#03060d;-webkit-text-size-adjust:100%}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:#03060d;color:#f0f4ff;
+  min-height:100vh;min-height:100dvh;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
 
-/* Logo */
-.logo-block{text-align:center;margin-bottom:1.9rem;animation:fadeUp .7s ease both}
-.logo-ring{width:100px;height:100px;margin:0 auto .9rem;position:relative;animation:logoFloat 4s ease-in-out infinite}
-.logo-ring::before{content:'';position:absolute;inset:-8px;border-radius:50%;border:1.5px solid rgba(240,180,41,.25);animation:ringPulse 3s ease-in-out infinite}
-.logo-ring::after{content:'';position:absolute;inset:-16px;border-radius:50%;border:1px solid rgba(240,180,41,.1);animation:ringPulse 3s ease-in-out infinite .5s}
-.logo-ring img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 28px rgba(240,180,41,.72));animation:logoSpin 10s ease-in-out infinite;position:relative;z-index:1}
-.logo-title{font-family:var(--fh);font-size:2rem;font-weight:900;letter-spacing:5px;background:linear-gradient(90deg,var(--gold3),var(--gold2),var(--gold),var(--gold2),var(--gold3));background-size:250%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 3.5s linear infinite}
-.logo-sub{color:var(--text2);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;margin-top:.3rem}
-.logo-ver{display:inline-flex;align-items:center;gap:.35rem;background:rgba(240,180,41,.1);border:1px solid var(--border2);border-radius:20px;padding:.2rem .7rem;font-size:.62rem;color:var(--gold);font-family:var(--fh);letter-spacing:1px;margin-top:.55rem}
+/* ===== CSS VARIABLES ===== */
+:root{
+  --gold:#f0b429;--gold2:#ffe566;--gold3:#b87800;
+  --cyan:#00e5ff;--purple:#a78bfa;
+  --green:#10b981;--green2:#34d399;
+  --red:#f43f5e;--orange:#fb923c;
+  --bg:#03060d;--bg2:#07101f;--bg3:#0b1628;
+  --surface:rgba(7,16,31,0.85);
+  --border:rgba(255,255,255,0.07);
+  --border-gold:rgba(240,180,41,0.3);
+  --text1:#f0f4ff;--text2:#6b84a3;--text3:#2a3a52;
+  --radius:16px;--radius2:12px;--radius3:8px;
+  --ease:cubic-bezier(0.4,0,0.2,1);
+  --spring:cubic-bezier(0.34,1.56,0.64,1);
+}
 
-@keyframes logoFloat {0%,100%{transform:translateY(0) rotateX(0)}50%{transform:translateY(-10px) rotateX(3deg)}}
-@keyframes logoSpin  {0%,100%{transform:rotateY(0) scale(1)}50%{transform:rotateY(18deg) scale(1.05)}}
-@keyframes ringPulse {0%,100%{opacity:.4;transform:scale(1)}50%{opacity:.8;transform:scale(1.05)}}
-@keyframes shimmer   {0%{background-position:0%}100%{background-position:250%}}
+/* ===== BACKGROUND ===== */
+.bg-wrap{
+  position:fixed;inset:0;z-index:0;
+  pointer-events:none;overflow:hidden;
+  will-change:transform;
+}
+/* Subtle grid — very light so no lag */
+.bg-wrap::after{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(0,229,255,0.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,229,255,0.025) 1px,transparent 1px);
+  background-size:56px 56px;
+  animation:bgGrid 60s linear infinite;
+  transform:translateZ(0);
+}
+@keyframes bgGrid{to{background-position:56px 56px}}
 
-/* Card */
-.auth-card{width:100%;max-width:420px;animation:scaleIn .5s .1s var(--spring) both}
+/* Orbs — use transform only for GPU */
+.orb{
+  position:absolute;border-radius:50%;
+  filter:blur(80px);pointer-events:none;
+  will-change:transform;
+  animation:orbAnim ease-in-out infinite alternate;
+}
+.orb-1{width:480px;height:480px;top:-140px;right:-120px;background:radial-gradient(circle,rgba(240,180,41,0.08),transparent 65%);animation-duration:22s}
+.orb-2{width:380px;height:380px;bottom:-120px;left:-100px;background:radial-gradient(circle,rgba(0,229,255,0.06),transparent 65%);animation-duration:28s}
+.orb-3{width:260px;height:260px;top:45%;left:42%;background:radial-gradient(circle,rgba(167,139,250,0.05),transparent 65%);animation-duration:18s}
+@keyframes orbAnim{0%{transform:translate3d(0,0,0)}100%{transform:translate3d(22px,-18px,0)}}
 
-/* Tabs */
-.tabs{display:flex;background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:3px;margin-bottom:1.3rem;gap:2px}
-.tab{flex:1;padding:.65rem;border:none;border-radius:9px;font-family:var(--fh);font-size:.68rem;letter-spacing:1.5px;cursor:pointer;transition:var(--t);color:var(--text2);background:transparent}
-.tab.on{background:linear-gradient(135deg,var(--gold2),var(--gold),var(--gold3));color:var(--dark);font-weight:800;box-shadow:0 2px 12px rgba(240,180,41,.35)}
+/* ===== LOADER ===== */
+#ldr{
+  position:fixed;inset:0;background:#03060d;z-index:999;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.1rem;
+  transition:opacity 0.5s var(--ease),visibility 0.5s;
+}
+#ldr.hide{opacity:0;visibility:hidden;pointer-events:none}
+.ldr-img{width:64px;height:64px;object-fit:contain;animation:imgPulse 2s ease-in-out infinite;filter:drop-shadow(0 0 20px rgba(240,180,41,0.6))}
+@keyframes imgPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07);filter:drop-shadow(0 0 32px rgba(240,180,41,0.9))}}
+.ldr-ring{position:relative;width:42px;height:42px}
+.ldr-ring::before,.ldr-ring::after{content:'';position:absolute;border-radius:50%;border:2.5px solid transparent}
+.ldr-ring::before{inset:0;border-top-color:var(--gold);border-right-color:var(--gold3);animation:spin 0.8s linear infinite}
+.ldr-ring::after{inset:7px;border-bottom-color:var(--cyan);animation:spin 1.4s linear infinite reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ldr-txt{font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:4px;color:var(--text2);animation:txtFade 1.6s infinite}
+@keyframes txtFade{0%,100%{opacity:0.4}50%{opacity:1}}
 
-/* Field */
-.field{position:relative;margin-bottom:1.05rem}
-.field-lbl{font-family:var(--fh);font-size:.64rem;letter-spacing:2px;color:var(--text2);display:block;margin-bottom:.38rem;text-transform:uppercase}
-.field-ico{position:absolute;left:.9rem;top:50%;transform:translateY(-50%);font-size:.95rem;color:var(--text2);pointer-events:none;transition:color .2s,transform .2s}
-.field-inp{padding-left:2.75rem!important}
-.field:focus-within .field-ico{color:var(--gold);transform:translateY(-50%) scale(1.1)}
+/* ===== PAGE ===== */
+.page{
+  position:relative;z-index:1;
+  min-height:100vh;min-height:100dvh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:1.5rem;
+  animation:pageIn 0.4s var(--ease);
+}
+@keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-/* Error/Success */
-.err-box{background:rgba(255,68,102,.1);border:1px solid rgba(255,68,102,.28);border-radius:var(--r2);padding:.68rem 1rem;color:var(--red);font-size:.81rem;margin-bottom:.85rem;display:none}
-.err-box.show{display:block;animation:shake .4s ease}
-.ok-box{background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.26);border-radius:var(--r2);padding:.8rem 1rem;color:var(--green);font-size:.84rem;margin-bottom:.85rem;display:none;line-height:1.65}
-.ok-box.show{display:block;animation:fadeIn .4s ease}
-.info-box{background:rgba(240,180,41,.07);border:1px solid var(--border2);border-radius:var(--r2);padding:.8rem 1rem;margin-bottom:1.15rem;font-size:.81rem;color:var(--text2);line-height:1.65}
+/* ===== LOGO ===== */
+.logo-wrap{text-align:center;margin-bottom:1.8rem}
+.logo-img{
+  width:78px;height:78px;object-fit:contain;
+  display:block;margin:0 auto 0.9rem;
+  filter:drop-shadow(0 0 22px rgba(240,180,41,0.65));
+  animation:logoAnim 6s ease-in-out infinite;
+  will-change:transform;
+}
+@keyframes logoAnim{
+  0%,100%{transform:translateY(0) rotateY(0deg)}
+  30%{transform:translateY(-7px) rotateY(8deg)}
+  60%{transform:translateY(-4px) rotateY(-6deg)}
+}
+.logo-name{
+  font-family:'Orbitron',monospace;font-size:1.9rem;font-weight:900;letter-spacing:6px;
+  background:linear-gradient(90deg,var(--gold3) 0%,var(--gold2) 40%,var(--cyan) 70%,var(--gold2) 90%,var(--gold3) 100%);
+  background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:shimmer 4s linear infinite;
+}
+@keyframes shimmer{0%{background-position:0%}100%{background-position:300%}}
+.logo-sub{font-size:0.68rem;letter-spacing:3px;color:var(--text2);text-transform:uppercase;margin-top:0.3rem}
 
-/* Footer */
-.login-foot{margin-top:1.7rem;text-align:center;color:var(--text2);font-size:.7rem;letter-spacing:1px;animation:fadeUp .6s .3s ease both}
-.login-foot .g{color:var(--gold)}
-.admin-lnk{display:block;text-align:center;margin-top:.9rem;color:var(--text3);font-size:.74rem;text-decoration:none;transition:color .2s}
-.admin-lnk:hover{color:var(--gold)}
+/* ===== CARD ===== */
+.card{
+  width:100%;max-width:400px;
+  background:var(--surface);
+  backdrop-filter:blur(28px) saturate(160%);
+  -webkit-backdrop-filter:blur(28px) saturate(160%);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:0 20px 60px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.04);
+  position:relative;overflow:hidden;
+  animation:cardIn 0.5s 0.1s var(--spring) both;
+}
+@keyframes cardIn{from{opacity:0;transform:scale(0.9) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),var(--cyan),transparent);
+}
+.card-body{padding:1.7rem}
+
+/* ===== TABS ===== */
+.tabs{
+  display:flex;background:rgba(3,6,13,0.8);
+  border:1px solid var(--border);border-radius:10px;padding:3px;gap:3px;
+  margin-bottom:1.3rem;
+}
+.tab{
+  flex:1;padding:0.58rem;border:none;border-radius:8px;
+  font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:1.5px;
+  cursor:pointer;color:var(--text2);background:transparent;
+  transition:all 0.2s var(--ease);user-select:none;
+}
+.tab.on{
+  background:linear-gradient(135deg,var(--gold),var(--gold3));
+  color:#03060d;font-weight:700;
+  box-shadow:0 2px 10px rgba(240,180,41,0.32);
+}
+
+/* ===== FORM ===== */
+.fl{display:block;font-family:'Orbitron',monospace;font-size:0.58rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--text2);margin-bottom:0.36rem}
+.fg{margin-bottom:0.9rem;position:relative}
+.fi-ic{position:absolute;left:0.9rem;top:50%;transform:translateY(-50%);font-size:0.92rem;color:var(--text3);pointer-events:none;transition:color 0.2s}
+.fg:focus-within .fi-ic{color:var(--gold)}
+.fi{
+  width:100%;background:rgba(3,6,13,0.7);border:1px solid var(--border);
+  border-radius:var(--radius2);padding:0.74rem 1rem 0.74rem 2.7rem;
+  color:var(--text1);font-family:'Inter',sans-serif;font-size:0.89rem;
+  outline:none;transition:border-color 0.2s,box-shadow 0.2s;
+  -webkit-appearance:none;
+}
+.fi:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(240,180,41,0.1)}
+.fi::placeholder{color:var(--text3)}
+
+/* ===== BUTTONS ===== */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:0.45rem;
+  padding:0.72rem 1.2rem;border-radius:var(--radius2);
+  font-family:'Inter',sans-serif;font-size:0.87rem;font-weight:600;
+  cursor:pointer;border:none;text-decoration:none;white-space:nowrap;
+  position:relative;overflow:hidden;user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform 0.15s var(--ease),box-shadow 0.18s;
+  will-change:transform;
+}
+/* Shine on hover */
+.btn::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,0.16) 50%,transparent 70%);
+  transform:translateX(-100%) skewX(-15deg);
+  transition:transform 0.45s var(--ease);
+}
+.btn:hover::after{transform:translateX(160%) skewX(-15deg)}
+.btn:active{transform:scale(0.95) !important}
+.btn:disabled{opacity:0.42;cursor:not-allowed;transform:none !important}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold3));color:#03060d;font-weight:700;box-shadow:0 4px 16px rgba(240,180,41,0.32)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(240,180,41,0.44)}
+.btn-cyan{background:linear-gradient(135deg,var(--cyan),#0099bb);color:#03060d;font-weight:700;box-shadow:0 4px 16px rgba(0,229,255,0.26)}
+.btn-cyan:hover{transform:translateY(-2px)}
+.btn-ghost{background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--text2)}
+.btn-ghost:hover{background:rgba(255,255,255,0.09);color:var(--text1)}
+.btn-red{background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.28);color:var(--red)}
+.btn-full{width:100%;margin-top:0.3rem;padding:0.82rem}
+
+/* ===== ALERTS ===== */
+.alert{border-radius:var(--radius3);padding:0.62rem 0.9rem;font-size:0.79rem;margin-bottom:0.8rem;display:none}
+.alert.on{display:block}
+.alert-err{background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.28);color:var(--red);animation:shake 0.35s}
+.alert-ok{background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:var(--green2);line-height:1.6;animation:fadeUp 0.3s var(--ease)}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== FOOTER ===== */
+.footer{margin-top:1.4rem;text-align:center;font-size:0.68rem;color:var(--text3);letter-spacing:0.5px}
+.footer b{color:var(--gold)}
+
+/* ===== TOASTS ===== */
+#toasts{position:fixed;top:0.9rem;right:0.9rem;z-index:9999;display:flex;flex-direction:column;gap:0.45rem;pointer-events:none}
+.toast{
+  background:rgba(3,6,13,0.97);backdrop-filter:blur(20px);
+  border:1px solid var(--border);border-radius:10px;
+  padding:0.65rem 1rem;display:flex;align-items:center;gap:0.5rem;
+  font-size:0.8rem;min-width:180px;max-width:280px;
+  pointer-events:all;animation:tIn 0.32s var(--spring);
+}
+.toast.out{animation:tOut 0.25s var(--ease) forwards}
+.toast.ok{border-left:3px solid var(--green2)}
+.toast.err{border-left:3px solid var(--red)}
+.toast.info{border-left:3px solid var(--cyan)}
+@keyframes tIn{from{opacity:0;transform:translateX(16px) scale(0.9)}to{opacity:1;transform:translateX(0) scale(1)}}
+@keyframes tOut{to{opacity:0;transform:translateX(16px)}}
 </style>
 </head>
 <body>
-<div class="bg-canvas"><div class="particles"></div><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
-
-<!-- Loader -->
-<div class="loader" id="loader">
-  <img src="https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png" class="loader-logo" alt="MITV">
-  <div class="loader-ring"></div>
-  <div class="loader-txt">MITV Network Loading...</div>
-  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+<div class="bg-wrap">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
 </div>
 
-<!-- Sound -->
-<button id="sndBtn" onclick="toggleSound()" style="position:fixed;top:1rem;right:1rem;z-index:99;background:var(--glass2);border:1px solid var(--border);border-radius:8px;padding:.38rem .7rem;color:var(--text);cursor:pointer;font-size:.95rem;backdrop-filter:blur(12px);transition:var(--t)">🔊</button>
-
-<!-- PWA Banner -->
-<div class="pwa-bar" id="pwaBanner" style="bottom:1.4rem">
-  <img src="https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png" alt="MITV">
-  <div class="pwa-bar-text"><div class="pwa-bar-title">MITV App Install Karein</div><div class="pwa-bar-sub">Home screen pe add — fast access</div></div>
-  <button class="btn btn-gold btn-sm" onclick="installPWA()">Install</button>
+<div id="ldr">
+  <img src="https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png" class="ldr-img" alt="MITV">
+  <div class="ldr-ring"></div>
+  <div class="ldr-txt">MITV LOADING</div>
 </div>
 
-<div class="login-wrap">
-  <div class="logo-block">
-    <div class="logo-ring"><img src="https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png" alt="MITV"></div>
-    <div class="logo-title">MITV NETWORK</div>
-    <div class="logo-sub">Reseller Management Portal</div>
-    <div class="logo-ver">✨ v4.0 Ultra</div>
+<div id="toasts"></div>
+
+<div class="page">
+  <div class="logo-wrap">
+    <img src="https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png" class="logo-img" alt="MITV Network Logo">
+    <div class="logo-name">MITV</div>
+    <div class="logo-sub">Network Portal v5.0</div>
   </div>
 
-  <div class="auth-card card" style="padding:1.8rem 2rem">
-    <div class="gold-bar"></div>
-    <div class="tabs">
-      <button class="tab on" id="t1" onclick="switchTab('login')">🔐 Login</button>
-      <button class="tab" id="t2" onclick="switchTab('reg')">📝 Register</button>
-    </div>
-
-    <!-- LOGIN -->
-    <div id="loginForm">
-      <div class="err-box" id="loginErr"></div>
-      <div class="field">
-        <label class="field-lbl">Phone Number</label>
-        <span class="field-ico">📞</span>
-        <input type="tel" class="form-input field-inp" id="lPhone" placeholder="03XX-XXXXXXX" autocomplete="tel">
+  <div class="card">
+    <div class="card-body">
+      <div class="tabs">
+        <button class="tab on" id="tL" onclick="sw('l')">🔐 LOGIN</button>
+        <button class="tab"    id="tR" onclick="sw('r')">📝 REGISTER</button>
       </div>
-      <div class="field">
-        <label class="field-lbl">Password</label>
-        <span class="field-ico">🔑</span>
-        <input type="password" class="form-input field-inp" id="lPass" placeholder="••••••••" autocomplete="current-password">
+
+      <!-- LOGIN -->
+      <div id="fL">
+        <div class="alert alert-err" id="lE"></div>
+        <div class="fg">
+          <label class="fl">Phone Number</label>
+          <span class="fi-ic">📞</span>
+          <input class="fi" type="tel" id="lP" placeholder="03XX-XXXXXXX" autocomplete="tel" inputmode="tel">
+        </div>
+        <div class="fg">
+          <label class="fl">Password</label>
+          <span class="fi-ic">🔑</span>
+          <input class="fi" type="password" id="lW" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <button class="btn btn-gold btn-full" id="lBtn" onclick="doLogin()"
+          style="font-family:'Orbitron',monospace;font-size:0.76rem;letter-spacing:2.5px">
+          LOGIN KAREIN
+        </button>
+        <a href="admin.html"
+          style="display:block;text-align:center;margin-top:0.9rem;color:var(--text3);font-size:0.72rem;text-decoration:none;transition:color 0.2s"
+          onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text3)'">
+          👑 Admin Portal →
+        </a>
       </div>
-      <button class="btn btn-gold btn-full" id="loginBtn" onclick="doLogin()" style="margin-top:.35rem;padding:.9rem;font-size:.93rem;letter-spacing:2px">⚡ LOGIN KAREIN</button>
-      <a href="admin.html" class="admin-lnk">👑 Admin Portal →</a>
-    </div>
 
-    <!-- REGISTER -->
-    <div id="regForm" style="display:none">
-      <div class="info-box">ℹ️ Request admin (Muaaz) ke paas jayegi. Approve hone ke baad login kar sakte ho.</div>
-      <div class="err-box" id="regErr"></div>
-      <div class="ok-box" id="regOk"></div>
-      <div class="field"><label class="field-lbl">Pura Naam</label><span class="field-ico">👤</span><input type="text" class="form-input field-inp" id="rName" placeholder="Muhammad Ali"></div>
-      <div class="field"><label class="field-lbl">WhatsApp Number</label><span class="field-ico">📞</span><input type="tel" class="form-input field-inp" id="rPhone" placeholder="03XX-XXXXXXX"></div>
-      <div class="field"><label class="field-lbl">City</label><span class="field-ico">📍</span><input type="text" class="form-input field-inp" id="rCity" placeholder="Lahore, Karachi..."></div>
-      <div class="field"><label class="field-lbl">Password</label><span class="field-ico">🔒</span><input type="password" class="form-input field-inp" id="rPass" placeholder="Min 4 characters"></div>
-      <div class="field"><label class="field-lbl">MITV Se Kaise Suna?</label><span class="field-ico">💬</span><input type="text" class="form-input field-inp" id="rRef" placeholder="Dost, social media..."></div>
-      <button class="btn btn-gold btn-full" id="regBtn" onclick="doReg()" style="margin-top:.35rem;padding:.9rem;letter-spacing:1px">📤 Request Bhejo</button>
+      <!-- REGISTER -->
+      <div id="fR" style="display:none">
+        <div style="background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,0.16);border-radius:var(--radius3);padding:0.65rem 0.9rem;font-size:0.76rem;color:var(--text2);line-height:1.65;margin-bottom:0.95rem">
+          ℹ️ Request Admin Muaaz ke paas jayegi. Approve hone ke baad login milega.
+        </div>
+        <div class="alert alert-err" id="rE"></div>
+        <div class="alert alert-ok"  id="rO"></div>
+        <div class="fg"><label class="fl">Pura Naam *</label><span class="fi-ic">👤</span><input class="fi" id="rN" placeholder="Muhammad Ali"></div>
+        <div class="fg"><label class="fl">WhatsApp *</label><span class="fi-ic">📞</span><input class="fi" type="tel" id="rP" placeholder="03XX-XXXXXXX" inputmode="tel"></div>
+        <div class="fg"><label class="fl">City</label><span class="fi-ic">📍</span><input class="fi" id="rC" placeholder="Lahore, Karachi..."></div>
+        <div class="fg"><label class="fl">Password *</label><span class="fi-ic">🔒</span><input class="fi" type="password" id="rW" placeholder="Min 4 characters"></div>
+        <button class="btn btn-cyan btn-full" id="rBtn" onclick="doReg()"
+          style="font-family:'Orbitron',monospace;font-size:0.74rem;letter-spacing:1.5px">
+          REQUEST BHEJO
+        </button>
+      </div>
     </div>
   </div>
 
-  <div class="login-foot">
-    🏢 <span class="g">MUSLIM ISLAM</span> &nbsp;|&nbsp; 👑 <span class="g">Muaaz Iqbal</span> (Kasur, Punjab)
-  </div>
+  <div class="footer">🏢 <b>MUSLIM ISLAM</b> &nbsp;·&nbsp; 👑 <b>Muaaz Iqbal</b> (Kasur, Punjab, Pakistan)</div>
 </div>
 
-<div id="toastBox"></div>
-<script src="js/sounds.js"></script>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-import { getDatabase, ref, get, push } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
-import { firebaseConfig, showToast, regSW } from './js/firebase-config.js';
+<script>
+// Register SW
+if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});
 
-const app=initializeApp(firebaseConfig), db=getDatabase(app);
-regSW();
+// Session check — instant redirect
+(function(){
+  try{
+    const s=JSON.parse(localStorage.getItem('mitv_s')||'null');
+    if(s&&s.id){
+      sessionStorage.setItem('ms',JSON.stringify(s));
+      location.href=s.role==='admin'?'admin.html':'dashboard.html';
+    }
+  }catch(e){localStorage.removeItem('mitv_s')}
+})();
 
-setTimeout(()=>document.getElementById('loader').classList.add('hide'),1800);
+// Loader hide
+window.addEventListener('load',()=>setTimeout(()=>document.getElementById('ldr').classList.add('hide'),900));
 
-// Session check
-const s=localStorage.getItem('mitv_session');
-if(s){try{const p=JSON.parse(s);if(p?.id){sessionStorage.setItem('mitv_reseller',s);location.href=p.role==='admin'?'admin.html':'dashboard.html'}}catch{localStorage.removeItem('mitv_session')}}
+// Sounds — Web Audio, no files, no lag
+let _ac=null,sOn=true;
+function gAC(){
+  if(!_ac)try{_ac=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}
+  if(_ac&&_ac.state==='suspended')_ac.resume();
+  return _ac;
+}
+function tone(f,d,g,dl){
+  if(!sOn)return;
+  const c=gAC();if(!c)return;
+  try{
+    const o=c.createOscillator(),gn=c.createGain();
+    o.connect(gn);gn.connect(c.destination);
+    o.frequency.value=f;
+    const t=c.currentTime+(dl||0);
+    gn.gain.setValueAtTime(0,t);
+    gn.gain.linearRampToValueAtTime(g||0.2,t+0.01);
+    gn.gain.exponentialRampToValueAtTime(0.001,t+(d||0.08));
+    o.start(t);o.stop(t+(d||0.08)+0.05);
+  }catch(e){}
+}
+const S={
+  click:()=>{tone(800,0.05,0.18);tone(600,0.04,0.12,0.03)},
+  ok:()=>{[523,659,784].forEach((f,i)=>tone(f,0.1,0.2,i*0.09))},
+  err:()=>{tone(250,0.12,0.2);tone(180,0.1,0.15,0.1)},
+  nav:()=>tone(560,0.07,0.14)
+};
+function ps(n){try{S[n]&&S[n]()}catch(e){}}
+document.addEventListener('click',()=>gAC(),{once:true});
+
+// Toast
+function toast(msg,type,ms){
+  const c=document.getElementById('toasts'),t=document.createElement('div');
+  t.className='toast '+(type||'info');
+  t.innerHTML='<span>'+({ok:'✅',err:'❌',info:'ℹ️'}[type]||'•')+'</span><span>'+msg+'</span>';
+  c.appendChild(t);ps(type==='ok'?'ok':type==='err'?'err':'nav');
+  setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),260)},ms||3000);
+}
 
 // Tab switch
-window.switchTab=t=>{
-  playSound('nav');
-  const isL=t==='login';
-  document.getElementById('loginForm').style.display=isL?'block':'none';
-  document.getElementById('regForm').style.display=isL?'none':'block';
-  document.getElementById('t1').classList.toggle('on',isL);
-  document.getElementById('t2').classList.toggle('on',!isL);
-};
+function sw(t){
+  ps('nav');
+  const isL=t==='l';
+  document.getElementById('fL').style.display=isL?'block':'none';
+  document.getElementById('fR').style.display=isL?'none':'block';
+  document.getElementById('tL').classList.toggle('on',isL);
+  document.getElementById('tR').classList.toggle('on',!isL);
+}
 
-// Enter keys
-['lPhone','lPass'].forEach(id=>document.getElementById(id)?.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()}));
-['rName','rPhone','rCity','rPass','rRef'].forEach(id=>document.getElementById(id)?.addEventListener('keydown',e=>{if(e.key==='Enter')doReg()}));
+// Enter key
+document.addEventListener('DOMContentLoaded',()=>{
+  ['lP','lW'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+  });
+});
 
-// Login
-window.doLogin=async()=>{
-  const phone=document.getElementById('lPhone').value.trim();
-  const pass=document.getElementById('lPass').value.trim();
-  const err=document.getElementById('loginErr');
-  const btn=document.getElementById('loginBtn');
-  err.classList.remove('show');
-  if(!phone||!pass){err.textContent='⚠️ Phone aur password zaroori hain.';err.classList.add('show');playSound('error');return}
-  btn.disabled=true;btn.innerHTML='<span class="spin"></span> Checking...';
+// Firebase — lazy import
+async function getDB(){
+  const{initializeApp}=await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js');
+  const{getDatabase,ref,get,push}=await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js');
+  // ⚠️ REPLACE WITH YOUR FIREBASE CONFIG
+  const cfg={
+    apiKey:"YOUR_FIREBASE_API_KEY",
+    authDomain:"ramadan-2385b.firebaseapp.com",
+    databaseURL:"https://ramadan-2385b-default-rtdb.firebaseio.com",
+    projectId:"ramadan-2385b",
+    storageBucket:"ramadan-2385b.appspot.com",
+    messagingSenderId:"YOUR_SENDER_ID",
+    appId:"YOUR_APP_ID"
+  };
+  let app;
+  try{const{getApp}=await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js');app=getApp()}
+  catch(e){app=initializeApp(cfg)}
+  return{db:getDatabase(app),ref,get,push};
+}
+
+// LOGIN
+async function doLogin(){
+  const ph=document.getElementById('lP').value.trim();
+  const pw=document.getElementById('lW').value.trim();
+  const eEl=document.getElementById('lE'),btn=document.getElementById('lBtn');
+  eEl.classList.remove('on');
+  if(!ph||!pw){eEl.textContent='⚠️ Phone aur password zaroori hain.';eEl.classList.add('on');ps('err');return}
+  btn.disabled=true;
+  btn.innerHTML='<span style="width:13px;height:13px;border:2px solid rgba(3,6,13,0.4);border-top-color:#03060d;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px"></span>Verify...';
   try{
+    const{db,ref,get}=await getDB();
     const snap=await get(ref(db,'resellers'));
+    if(!snap.exists())throw new Error('No data');
     let found=null;
-    if(snap.exists())for(const[id,d]of Object.entries(snap.val()))
-      if(d.number===phone&&d.password===pass&&d.active!==false){found={...d,id,role:'reseller'};break}
+    snap.forEach(child=>{
+      const d=child.val();
+      if(d.number===ph&&d.password===pw&&d.active!==false)
+        found={...d,id:child.key,role:'reseller'};
+    });
     if(found){
-      localStorage.setItem('mitv_session',JSON.stringify(found));
-      sessionStorage.setItem('mitv_reseller',JSON.stringify(found));
-      playSound('success');showToast('✅ Welcome, '+found.name+'!','success');
-      setTimeout(()=>location.href='dashboard.html',800);
+      localStorage.setItem('mitv_s',JSON.stringify(found));
+      sessionStorage.setItem('ms',JSON.stringify(found));
+      ps('ok');toast('✅ Welcome, '+found.name+'!','ok');
+      setTimeout(()=>location.href='dashboard.html',650);
     }else throw new Error('invalid');
-  }catch{
-    playSound('error');
-    err.textContent='❌ Galat phone number ya password.';err.classList.add('show');
-    btn.disabled=false;btn.innerHTML='⚡ LOGIN KAREIN';
-  }
-};
-
-// Register
-window.doReg=async()=>{
-  const name=document.getElementById('rName').value.trim();
-  const phone=document.getElementById('rPhone').value.trim();
-  const city=document.getElementById('rCity').value.trim();
-  const pass=document.getElementById('rPass').value.trim();
-  const ref2=document.getElementById('rRef').value.trim();
-  const err=document.getElementById('regErr'),ok=document.getElementById('regOk'),btn=document.getElementById('regBtn');
-  err.classList.remove('show');ok.classList.remove('show');
-  if(!name||!phone||!pass){err.textContent='⚠️ Naam, phone aur password zaroori.';err.classList.add('show');playSound('error');return}
-  if(pass.length<4){err.textContent='⚠️ Password min 4 characters.';err.classList.add('show');playSound('error');return}
-  btn.disabled=true;btn.innerHTML='<span class="spin"></span> Bhej raha hai...';
-  try{
-    await push(ref(db,'reseller_requests'),{name,phone,city,password:pass,reference:ref2,status:'pending',requested_at:Date.now()});
-    playSound('deploy');
-    ok.innerHTML='✅ <strong>Request bhaij di!</strong><br>Muaaz approve karega aur login details bhejega.<br>📞 Kasur, Punjab';
-    ok.classList.add('show');
-    ['rName','rPhone','rCity','rPass','rRef'].forEach(id=>document.getElementById(id).value='');
   }catch(e){
-    err.textContent='❌ Error: '+e.message;err.classList.add('show');playSound('error');
+    ps('err');
+    eEl.textContent='❌ Galat phone ya password.';
+    eEl.classList.add('on');
+    btn.disabled=false;
+    btn.innerHTML='LOGIN KAREIN';
   }
-  btn.disabled=false;btn.innerHTML='📤 Request Bhejo';
-};
+}
+
+// REGISTER
+async function doReg(){
+  const nm=document.getElementById('rN').value.trim();
+  const ph=document.getElementById('rP').value.trim();
+  const ct=document.getElementById('rC').value.trim();
+  const pw=document.getElementById('rW').value.trim();
+  const eEl=document.getElementById('rE'),oEl=document.getElementById('rO'),btn=document.getElementById('rBtn');
+  eEl.classList.remove('on');oEl.classList.remove('on');
+  if(!nm||!ph||!pw){eEl.textContent='⚠️ Naam, phone aur password zaroori.';eEl.classList.add('on');ps('err');return}
+  if(pw.length<4){eEl.textContent='⚠️ Password 4+ characters ka hona chahiye.';eEl.classList.add('on');ps('err');return}
+  btn.disabled=true;
+  btn.innerHTML='<span style="width:13px;height:13px;border:2px solid rgba(3,6,13,0.4);border-top-color:#03060d;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px"></span>Bhej raha hai...';
+  try{
+    const{db,ref,push}=await getDB();
+    await push(ref(db,'reseller_requests'),{name:nm,phone:ph,city:ct,password:pw,status:'pending',requested_at:Date.now()});
+    ps('ok');
+    oEl.innerHTML='✅ <strong>Request bhaij di!</strong><br>Admin Muaaz approve karega aur credentials bhejega.';
+    oEl.classList.add('on');
+    ['rN','rP','rC','rW'].forEach(id=>document.getElementById(id).value='');
+  }catch(e){
+    ps('err');eEl.textContent='❌ Error: '+e.message;eEl.classList.add('on');
+  }
+  btn.disabled=false;btn.innerHTML='REQUEST BHEJO';
+}
 </script>
 </body>
 </html>

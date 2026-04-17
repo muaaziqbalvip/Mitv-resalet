@@ -1,523 +1,982 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ur">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="theme-color" content="#f0b429">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>MITV — Dashboard</title>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="MITV Network Reseller Dashboard — Manage clients, chat, AI">
+<title>MITV — Reseller Dashboard</title>
 <link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="css/shared.css">
+<link rel="apple-touch-icon" href="https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
 <style>
-/* Revenue cards */
-.rev-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem}
-.rev-card{background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:.95rem 1.1rem}
-.rev-lbl{font-size:.65rem;color:var(--text2);text-transform:uppercase;letter-spacing:1px}
-.rev-val{font-family:var(--fh);font-size:1.4rem;color:var(--gold);margin-top:.28rem}
-.rev-sub{font-size:.68rem;color:var(--text3);margin-top:.1rem}
+/* ===== BASE ===== */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#03060d;overflow:hidden}
+body{font-family:'Inter',system-ui,sans-serif;color:#f0f4ff;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 
-/* Add client form */
-.add-form{background:var(--glass);border:1px solid var(--border);border-radius:16px;padding:1.4rem}
-.cost-preview{background:rgba(240,180,41,.07);border:1px solid var(--border2);border-radius:10px;padding:.88rem 1rem;margin:.8rem 0}
-.cost-title{font-family:var(--fh);font-size:.65rem;color:var(--gold);letter-spacing:2px;margin-bottom:.48rem}
-.cost-row{display:flex;justify-content:space-between;font-size:.81rem;padding:.18rem 0}
-.cost-row .cl{color:var(--text2)}
-.cost-row .cv{color:var(--gold);font-weight:700;font-family:var(--fh)}
-.cost-total{border-top:1px solid var(--border);padding-top:.4rem;margin-top:.2rem}
+:root{
+  --g:#f0b429;--g2:#ffe566;--g3:#b87800;
+  --c:#00e5ff;--p:#a78bfa;--gr:#10b981;--gr2:#34d399;
+  --r:#f43f5e;--or:#fb923c;--bl:#38bdf8;
+  --bg:#03060d;--bg2:#070f1e;--bg3:#0b1526;
+  --sf:rgba(7,15,30,0.88);--sf2:rgba(11,21,38,0.92);
+  --bd:rgba(255,255,255,0.07);--bdg:rgba(240,180,41,0.28);
+  --t1:#f0f4ff;--t2:#6b84a3;--t3:#28384f;
+  --r1:16px;--r2:12px;--r3:8px;
+  --ease:cubic-bezier(0.4,0,0.2,1);
+  --spring:cubic-bezier(0.34,1.56,0.64,1);
+  --bn:60px;
+  --topbar:50px;
+}
 
-/* Search page */
-.search-page-bar{display:flex;gap:.65rem;margin-bottom:1.1rem;max-width:500px}
+/* ===== BG ===== */
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bg::after{
+  content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(0,229,255,0.022) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.022) 1px,transparent 1px);
+  background-size:56px 56px;animation:bgGrid 70s linear infinite;transform:translateZ(0);
+}
+@keyframes bgGrid{to{background-position:56px 56px}}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;will-change:transform;animation:orbA ease-in-out infinite alternate}
+.o1{width:500px;height:500px;top:-160px;right:-120px;background:radial-gradient(circle,rgba(240,180,41,0.07),transparent 65%);animation-duration:24s}
+.o2{width:380px;height:380px;bottom:-120px;left:-100px;background:radial-gradient(circle,rgba(0,229,255,0.055),transparent 65%);animation-duration:30s}
+.o3{width:260px;height:260px;top:40%;left:38%;background:radial-gradient(circle,rgba(167,139,250,0.045),transparent 65%);animation-duration:20s}
+@keyframes orbA{0%{transform:translate3d(0,0,0)}100%{transform:translate3d(24px,-18px,0)}}
 
-/* AI page */
-.ai-page{max-width:680px}
-.ai-tag{display:inline-flex;align-items:center;gap:.4rem;background:rgba(240,180,41,.1);border:1px solid var(--border2);border-radius:20px;padding:.28rem .9rem;font-size:.7rem;color:var(--gold);margin-bottom:.9rem}
+/* ===== LOADER ===== */
+#ldr{position:fixed;inset:0;background:#03060d;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.1rem;transition:opacity 0.5s var(--ease),visibility 0.5s}
+#ldr.hide{opacity:0;visibility:hidden;pointer-events:none}
+.li{width:60px;height:60px;object-fit:contain;animation:liP 2s ease-in-out infinite;filter:drop-shadow(0 0 18px rgba(240,180,41,0.6))}
+@keyframes liP{0%,100%{transform:scale(1)}50%{transform:scale(1.07);filter:drop-shadow(0 0 30px rgba(240,180,41,0.9))}}
+.lr{position:relative;width:40px;height:40px}
+.lr::before,.lr::after{content:'';position:absolute;border-radius:50%;border:2.5px solid transparent}
+.lr::before{inset:0;border-top-color:var(--g);border-right-color:var(--g3);animation:spin 0.8s linear infinite}
+.lr::after{inset:7px;border-bottom-color:var(--c);animation:spin 1.4s linear infinite reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+.lt{font-family:'Orbitron',monospace;font-size:0.58rem;letter-spacing:4px;color:var(--t2);animation:ltF 1.6s infinite}
+@keyframes ltF{0%,100%{opacity:0.4}50%{opacity:1}}
 
-/* About page */
-.about-hero{background:linear-gradient(135deg,rgba(240,180,41,.1),rgba(240,180,41,.04));border:1px solid var(--border2);border-radius:18px;padding:1.8rem;text-align:center;margin-bottom:1rem;position:relative;overflow:hidden}
-.about-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(240,180,41,.06),transparent 70%)}
-.about-logo{width:72px;height:72px;filter:drop-shadow(0 0 20px rgba(240,180,41,.65));animation:lPulse 3s ease-in-out infinite;margin-bottom:.9rem}
-.about-name{font-family:var(--fh);font-size:1.1rem;letter-spacing:3px;color:var(--gold);margin-bottom:.25rem}
-.about-ver{display:inline-block;background:rgba(240,180,41,.14);border:1px solid var(--border2);border-radius:20px;padding:.2rem .75rem;font-size:.65rem;color:var(--gold);font-family:var(--fh);margin:.4rem 0 .8rem}
-.about-desc{font-size:.84rem;color:var(--text2);line-height:1.72;max-width:380px;margin:0 auto}
+/* ===== PIN ===== */
+.pin-ov{position:fixed;inset:0;background:rgba(3,6,13,0.97);backdrop-filter:blur(24px);z-index:8000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.28s var(--ease)}
+.pin-ov.on{opacity:1;pointer-events:all}
+.pin-box{background:var(--sf2);border:1px solid var(--bdg);border-radius:20px;padding:1.8rem 1.5rem;text-align:center;width:100%;max-width:290px;box-shadow:0 0 50px rgba(240,180,41,0.18);animation:pinIn 0.45s var(--spring)}
+@keyframes pinIn{from{transform:scale(0.72) rotate(-5deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+.pin-dots{display:flex;justify-content:center;gap:10px;margin:0.9rem 0}
+.pd{width:12px;height:12px;border-radius:50%;border:2px solid var(--bd);transition:all 0.18s var(--spring)}
+.pd.on{background:var(--g);border-color:var(--g);box-shadow:0 0 12px rgba(240,180,41,0.6);transform:scale(1.18)}
+.pd.er{background:var(--r);border-color:var(--r);animation:shake 0.38s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-top:0.85rem}
+.pk{aspect-ratio:1;border-radius:10px;border:1px solid var(--bd);background:rgba(255,255,255,0.04);color:var(--t1);font-family:'Orbitron',monospace;font-size:0.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.14s var(--spring);user-select:none;-webkit-tap-highlight-color:transparent}
+.pk:active{transform:scale(0.88);background:rgba(240,180,41,0.18);border-color:var(--bdg)}
+.pk.del{color:var(--r)}
+.pk.ok{background:rgba(240,180,41,0.1);border-color:var(--bdg);color:var(--g)}
 
-.info-card{background:var(--glass);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:.85rem}
-.info-row{display:flex;align-items:center;padding:.82rem 1.1rem;border-bottom:1px solid var(--border);gap:.85rem}
-.info-row:last-child{border-bottom:none}
-.info-ico{font-size:1.2rem;flex-shrink:0;width:28px;text-align:center}
-.info-content{flex:1}
-.info-lbl{font-size:.65rem;color:var(--text2);text-transform:uppercase;letter-spacing:1px;font-family:var(--fh)}
-.info-val{font-size:.88rem;color:var(--text);margin-top:.15rem}
+/* ===== APP SHELL ===== */
+.app{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column;background:transparent}
+.topbar{
+  height:var(--topbar);flex-shrink:0;
+  background:rgba(3,6,13,0.92);backdrop-filter:blur(24px) saturate(160%);
+  border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 1rem;z-index:100;
+}
+.tb-left{display:flex;align-items:center;gap:0.6rem}
+.tb-img{width:26px;height:26px;object-fit:contain;filter:drop-shadow(0 0 5px rgba(240,180,41,0.5))}
+.tb-name{font-family:'Orbitron',monospace;font-size:0.78rem;font-weight:700;letter-spacing:2px;color:var(--g)}
+.tb-right{display:flex;align-items:center;gap:0.65rem}
+.tb-user{font-size:0.7rem;color:var(--t2);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--gr2);box-shadow:0 0 6px var(--gr2);animation:dotP 2s ease-in-out infinite}
+@keyframes dotP{0%,100%{box-shadow:0 0 6px var(--gr2)}50%{box-shadow:0 0 14px var(--gr2),0 0 22px rgba(52,211,153,0.3)}}
 
-.pwa-install-btn{width:100%;margin-top:.5rem;padding:1rem;font-size:.92rem;letter-spacing:1.5px}
+/* ===== SCROLL AREA ===== */
+.scroll{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  /* GPU compositing for smooth scroll */
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  scroll-behavior:smooth;
+  padding-bottom:calc(var(--bn) + env(safe-area-inset-bottom) + 4px);
+  transform:translateZ(0);/* force GPU layer */
+}
+/* Thin scrollbar */
+.scroll::-webkit-scrollbar{width:2px}
+.scroll::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
 
-/* PIN change */
-.pin-field-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.8rem}
+/* ===== PAGES ===== */
+.pg{display:none;padding:0.9rem;animation:pgIn 0.25s var(--ease)}
+.pg.on{display:block}
+@keyframes pgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+/* Chat pages no padding */
+.pg.no-pad{padding:0}
+
+/* ===== BOTTOM NAV ===== */
+.bnav{
+  height:var(--bn);flex-shrink:0;
+  background:rgba(3,6,13,0.95);backdrop-filter:blur(28px) saturate(180%);
+  border-top:1px solid var(--bd);
+  display:flex;align-items:stretch;
+  padding-bottom:env(safe-area-inset-bottom);
+  z-index:100;
+}
+.bni{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0.2rem;border:none;background:transparent;color:var(--t3);
+  cursor:pointer;user-select:none;position:relative;
+  transition:color 0.18s var(--ease);
+  -webkit-tap-highlight-color:transparent;
+  padding:0.25rem 0.1rem;
+}
+.bni:active{background:rgba(255,255,255,0.03)}
+.bni.on{color:var(--g)}
+.bni-ic{font-size:1.22rem;transition:transform 0.22s var(--spring);display:block}
+.bni.on .bni-ic{transform:scale(1.1) translateY(-2px);filter:drop-shadow(0 0 5px rgba(240,180,41,0.5))}
+.bni-lb{font-family:'Orbitron',monospace;font-size:0.52rem;letter-spacing:0.8px;text-transform:uppercase;transition:color 0.18s}
+/* Active pill */
+.bni::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:0;height:2px;background:linear-gradient(90deg,var(--g3),var(--g2));border-radius:0 0 3px 3px;transition:width 0.22s var(--ease)}
+.bni.on::after{width:26px}
+
+/* ===== CARDS ===== */
+.card{
+  background:var(--sf);
+  backdrop-filter:blur(24px) saturate(160%);
+  -webkit-backdrop-filter:blur(24px) saturate(160%);
+  border:1px solid var(--bd);border-radius:var(--r1);
+  position:relative;overflow:hidden;
+  transition:transform 0.2s var(--ease),box-shadow 0.2s;
+  will-change:transform;
+}
+/* Top accent line */
+.card.lg::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--g),transparent)}
+.card.lc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--c),transparent)}
+.card.lp::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--p),transparent)}
+.card.lr2::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--r),transparent)}
+.card.lgr::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gr2),transparent)}
+
+/* Stat cards */
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:0.65rem;margin-bottom:0.9rem}
+.sc{padding:0.95rem 1rem;cursor:default}
+.sc:active{transform:scale(0.98)}
+.sc-i{font-size:1.25rem;margin-bottom:0.35rem}
+.sc-n{font-family:'Orbitron',monospace;font-size:1.65rem;font-weight:900;line-height:1;letter-spacing:-1px}
+.sc-l{font-size:0.62rem;color:var(--t2);text-transform:uppercase;letter-spacing:1.5px;margin-top:0.22rem}
+.sc-g{position:absolute;right:-5px;bottom:-7px;font-size:2.6rem;opacity:0.055;pointer-events:none}
+.cg{color:var(--g)}.cc{color:var(--c)}.cp{color:var(--p)}.cgr{color:var(--gr2)}.cr{color:var(--r)}.cor{color:var(--or)}
+
+/* Section header */
+.sh{display:flex;align-items:center;justify-content:space-between;margin:0.85rem 0 0.6rem}
+.sht{font-family:'Orbitron',monospace;font-size:0.62rem;letter-spacing:2.5px;color:var(--g);text-transform:uppercase}
+
+/* ===== BUTTONS ===== */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:0.42rem;
+  padding:0.62rem 1.1rem;border-radius:var(--r2);
+  font-family:'Inter',sans-serif;font-size:0.84rem;font-weight:600;
+  cursor:pointer;border:none;text-decoration:none;white-space:nowrap;
+  position:relative;overflow:hidden;user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform 0.14s var(--ease),box-shadow 0.18s;
+  will-change:transform;
+}
+.btn::after{content:'';position:absolute;inset:0;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,0.15) 50%,transparent 70%);transform:translateX(-100%) skewX(-15deg);transition:transform 0.42s var(--ease)}
+.btn:hover::after{transform:translateX(160%) skewX(-15deg)}
+.btn:active{transform:scale(0.94)!important}
+.btn:disabled{opacity:0.4;cursor:not-allowed;transform:none!important}
+.bg-gold{background:linear-gradient(135deg,var(--g),var(--g3));color:#03060d;font-weight:700;box-shadow:0 3px 14px rgba(240,180,41,0.32)}
+.bg-gold:hover{transform:translateY(-1px);box-shadow:0 5px 20px rgba(240,180,41,0.44)}
+.bg-cyan{background:linear-gradient(135deg,var(--c),#0099bb);color:#03060d;font-weight:700;box-shadow:0 3px 14px rgba(0,229,255,0.26)}
+.bg-purple{background:linear-gradient(135deg,var(--p),#7c3aed);color:#fff;font-weight:700}
+.bg-green{background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);color:var(--gr2)}
+.bg-green:hover{background:rgba(16,185,129,0.24)}
+.bg-red{background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.28);color:var(--r)}
+.bg-red:hover{background:rgba(244,63,94,0.22)}
+.bg-ghost{background:rgba(255,255,255,0.05);border:1px solid var(--bd);color:var(--t2)}
+.bg-ghost:hover{background:rgba(255,255,255,0.09);color:var(--t1)}
+.bfull{width:100%}
+.bsm{padding:0.33rem 0.72rem;font-size:0.74rem;border-radius:var(--r3)}
+
+/* ===== FORM ===== */
+.fl{display:block;font-family:'Orbitron',monospace;font-size:0.56rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--t2);margin-bottom:0.34rem}
+.fg{margin-bottom:0.85rem;position:relative}
+.fic{position:absolute;left:0.88rem;top:50%;transform:translateY(-50%);font-size:0.88rem;color:var(--t3);pointer-events:none;transition:color 0.18s}
+.fg:focus-within .fic{color:var(--g)}
+.fi{width:100%;background:rgba(3,6,13,0.72);border:1px solid var(--bd);border-radius:var(--r2);padding:0.7rem 0.95rem 0.7rem 2.6rem;color:var(--t1);font-family:'Inter',sans-serif;font-size:0.87rem;outline:none;transition:border-color 0.2s,box-shadow 0.2s;-webkit-appearance:none}
+.fi:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(240,180,41,0.1)}
+.fi::placeholder{color:var(--t3)}
+.fi.ni{padding-left:0.95rem}
+
+/* ===== BADGES ===== */
+.badge{display:inline-flex;align-items:center;gap:0.26rem;padding:0.18rem 0.58rem;border-radius:20px;font-family:'Orbitron',monospace;font-size:0.54rem;font-weight:700;letter-spacing:0.5px;white-space:nowrap}
+.bp{background:rgba(16,185,129,0.11);color:var(--gr2);border:1px solid rgba(16,185,129,0.26)}
+.bb{background:rgba(244,63,94,0.11);color:var(--r);border:1px solid rgba(244,63,94,0.26)}
+.bpend{background:rgba(251,146,60,0.11);color:var(--or);border:1px solid rgba(251,146,60,0.26)}
+
+/* ===== CLIENT LIST ITEMS ===== */
+.cli{
+  display:flex;align-items:center;gap:0.72rem;
+  padding:0.78rem 0.9rem;border-bottom:1px solid var(--bd);
+  cursor:pointer;transition:background 0.14s;
+  animation:cliIn 0.28s var(--ease) both;
+}
+.cli:last-child{border-bottom:none}
+.cli:active{background:rgba(255,255,255,0.03)}
+@keyframes cliIn{from{opacity:0;transform:translateX(-7px)}to{opacity:1;transform:translateX(0)}}
+.cav{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0}
+.cav-g{background:linear-gradient(135deg,var(--g3),var(--g));box-shadow:0 0 9px rgba(240,180,41,0.22)}
+.cav-c{background:linear-gradient(135deg,var(--c),#0099bb)}
+.cav-p{background:linear-gradient(135deg,var(--p),#7c3aed)}
+.cav-r{background:rgba(244,63,94,0.2)}
+.cav-gr{background:linear-gradient(135deg,var(--gr),#059669)}
+.cinf{flex:1;min-width:0}
+.cnm{font-weight:600;font-size:0.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.csub{font-size:0.7rem;color:var(--t2);margin-top:0.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cright{display:flex;flex-direction:column;align-items:flex-end;gap:0.28rem;flex-shrink:0}
+
+/* ===== REVENUE ===== */
+.rev-row{display:flex;justify-content:space-between;align-items:center;padding:0.55rem 0.9rem;border-bottom:1px solid var(--bd)}
+.rev-row:last-child{border-bottom:none}
+.rl{font-size:0.76rem;color:var(--t2)}
+.rv{font-family:'Orbitron',monospace;font-size:0.88rem;color:var(--g)}
+.rv.big{font-size:1.1rem}
+
+/* ===== DETAIL ROWS ===== */
+.dr{display:flex;align-items:flex-start;padding:0.55rem 0;border-bottom:1px solid var(--bd)}
+.dr:last-child{border-bottom:none}
+.dl{font-family:'Orbitron',monospace;font-size:0.54rem;letter-spacing:2px;color:var(--t3);width:68px;flex-shrink:0;padding-top:0.1rem;text-transform:uppercase}
+.dv{font-size:0.84rem;color:var(--t1);flex:1;word-break:break-word}
+.dv.mono{font-family:'Fira Code',monospace;font-size:0.73rem;color:var(--bl)}
+
+/* ===== M3U BOX ===== */
+.m3u-box{background:rgba(3,6,13,0.8);border:1px solid var(--bd);border-radius:var(--r2);padding:0.6rem 0.85rem;display:flex;align-items:center;gap:0.62rem;margin-top:0.45rem}
+.m3u-t{flex:1;font-family:'Fira Code',monospace;font-size:0.68rem;color:var(--bl);word-break:break-all}
+.cp-btn{background:rgba(255,255,255,0.05);border:1px solid var(--bd);border-radius:var(--r3);padding:0.28rem 0.58rem;color:var(--t2);font-size:0.7rem;cursor:pointer;flex-shrink:0;transition:all 0.16s}
+.cp-btn:active{border-color:var(--bdg);color:var(--g)}
+.cp-btn.done{background:rgba(16,185,129,0.14);border-color:rgba(16,185,129,0.28);color:var(--gr2)}
+
+/* ===== WA BOX ===== */
+.wa-box{background:rgba(3,6,13,0.8);border:1px solid rgba(37,211,102,0.18);border-radius:var(--r2);padding:0.78rem;font-size:0.74rem;line-height:1.7;color:var(--t1);white-space:pre-wrap;max-height:160px;overflow-y:auto;margin-top:0.65rem}
+
+/* ===== COST BOX ===== */
+.cost-box{background:rgba(240,180,41,0.06);border:1px solid rgba(240,180,41,0.22);border-radius:var(--r2);padding:0.82rem 0.95rem;margin:0.72rem 0}
+.cost-t{font-family:'Orbitron',monospace;font-size:0.56rem;letter-spacing:2px;color:var(--g);margin-bottom:0.48rem}
+.cost-r{display:flex;justify-content:space-between;font-size:0.77rem;padding:0.18rem 0}
+.cost-lbl{color:var(--t2)}
+.cost-val{color:var(--g);font-weight:700;font-family:'Orbitron',monospace}
+
+/* ===== SEARCH ===== */
+.srch-wrap{position:relative;margin-bottom:0.85rem}
+.srch-ic{position:absolute;left:0.85rem;top:50%;transform:translateY(-50%);font-size:0.86rem;pointer-events:none;color:var(--t3)}
+.srch{width:100%;background:rgba(3,6,13,0.72);border:1px solid var(--bd);border-radius:var(--r2);padding:0.68rem 0.95rem 0.68rem 2.4rem;color:var(--t1);font-family:'Inter',sans-serif;font-size:0.87rem;outline:none;transition:border-color 0.2s;-webkit-appearance:none}
+.srch:focus{border-color:var(--g)}
+.srch::placeholder{color:var(--t3)}
+
+/* ===== CHAT ===== */
+.chat-shell{
+  display:flex;flex-direction:column;
+  height:calc(100dvh - var(--topbar) - var(--bn) - env(safe-area-inset-bottom));
+  overflow:hidden;
+}
+.chat-hdr{
+  padding:0.72rem 0.95rem;border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;gap:0.72rem;flex-shrink:0;
+  background:rgba(3,6,13,0.88);
+}
+.chat-hdr-nm{font-weight:700;font-size:0.86rem}
+.chat-hdr-sb{font-size:0.66rem;color:var(--t2)}
+.chat-msgs{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  padding:0.85rem;display:flex;flex-direction:column;gap:0.68rem;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  scroll-behavior:smooth;
+}
+.chat-msgs::-webkit-scrollbar{width:2px}
+.chat-msgs::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
+.chat-foot{
+  padding:0.7rem 0.85rem;border-top:1px solid var(--bd);
+  display:flex;gap:0.55rem;align-items:flex-end;flex-shrink:0;
+  background:rgba(3,6,13,0.88);
+  padding-bottom:calc(0.7rem + env(safe-area-inset-bottom));
+}
+.msg{display:flex;gap:0.5rem;max-width:88%;animation:msgIn 0.24s var(--spring)}
+.msg.self{flex-direction:row-reverse;margin-left:auto}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px) scale(0.94)}to{opacity:1;transform:translateY(0) scale(1)}}
+.mav{width:27px;height:27px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.75rem;border:1px solid var(--bd)}
+.mav-g{background:linear-gradient(135deg,var(--g),var(--g3));box-shadow:0 0 8px rgba(240,180,41,0.3)}
+.mav-c{background:linear-gradient(135deg,var(--c),#0099bb)}
+.mav-p{background:linear-gradient(135deg,var(--p),#7c3aed)}
+.bubble{background:var(--sf2);border:1px solid var(--bd);border-radius:12px 12px 12px 3px;padding:0.58rem 0.85rem;font-size:0.83rem;line-height:1.6;color:var(--t1);word-break:break-word}
+.self .bubble{background:rgba(240,180,41,0.1);border-color:var(--bdg);border-radius:12px 12px 3px 12px}
+.ai-m .bubble{background:rgba(167,139,250,0.09);border-color:rgba(167,139,250,0.22)}
+.mmeta{font-size:0.58rem;color:var(--t3);margin-top:0.2rem}
+.self .mmeta{text-align:right}
+/* Thinking dots */
+.think{display:flex;gap:3px;align-items:center;padding:0.15rem 0}
+.think span{width:6px;height:6px;border-radius:50%;animation:thinkB 1.3s ease-in-out infinite}
+.think span:nth-child(1){background:var(--g)}
+.think span:nth-child(2){background:var(--c);animation-delay:0.15s}
+.think span:nth-child(3){background:var(--p);animation-delay:0.3s}
+@keyframes thinkB{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+/* Stream cursor */
+.scur::after{content:'▋';display:inline;animation:scurA 0.8s step-start infinite;color:var(--p)}
+@keyframes scurA{0%,100%{opacity:1}50%{opacity:0}}
+.chat-ta{flex:1;background:rgba(3,6,13,0.8);border:1px solid var(--bd);border-radius:10px;padding:0.6rem 0.88rem;color:var(--t1);font-family:'Inter',sans-serif;font-size:0.87rem;outline:none;resize:none;transition:border-color 0.2s;max-height:88px;-webkit-overflow-scrolling:touch;overflow-y:auto}
+.chat-ta:focus{border-color:var(--g)}
+.chat-ta::placeholder{color:var(--t3)}
+.sbtn{width:38px;height:38px;border-radius:9px;flex-shrink:0;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:transform 0.16s var(--spring)!important}
+.sbtn:active{transform:scale(0.88)!important}
+
+/* ===== ABOUT PAGE ===== */
+.about-row{display:flex;align-items:center;gap:0.85rem;padding:0.68rem 0;border-bottom:1px solid var(--bd)}
+.about-row:last-child{border-bottom:none}
+.about-ic{font-size:1.3rem;width:34px;text-align:center;flex-shrink:0}
+.about-lbl{font-family:'Orbitron',monospace;font-size:0.56rem;letter-spacing:2px;color:var(--t2);text-transform:uppercase;margin-bottom:0.12rem}
+.about-val{font-size:0.85rem;color:var(--t1);font-weight:500}
+.about-sub{font-size:0.7rem;color:var(--t2);margin-top:0.1rem}
+
+/* ===== BOTTOM SHEET MODAL ===== */
+.mo-ov{position:fixed;inset:0;background:rgba(0,0,0,0.72);backdrop-filter:blur(10px);z-index:700;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.24s var(--ease)}
+.mo-ov.on{opacity:1;pointer-events:all}
+.mo-box{width:100%;max-width:560px;max-height:90dvh;overflow-y:auto;background:var(--sf2);border:1px solid var(--bdg);border-radius:20px 20px 0 0;transform:translateY(100%);transition:transform 0.3s var(--spring);padding-bottom:env(safe-area-inset-bottom)}
+.mo-ov.on .mo-box{transform:translateY(0)}
+.mo-hd{padding:1rem 1.1rem 0.78rem;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--sf2);z-index:1}
+.mo-ttl{font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:2px;color:var(--g);text-transform:uppercase}
+.mo-cl{background:none;border:none;color:var(--t2);font-size:1.15rem;cursor:pointer;padding:0.2rem;line-height:1}
+.mo-body{padding:0.95rem 1.1rem}
+.mo-foot{padding:0.82rem 1.1rem;border-top:1px solid var(--bd);display:flex;gap:0.55rem;justify-content:flex-end;flex-wrap:wrap}
+
+/* ===== TOASTS ===== */
+#toasts{position:fixed;top:0.85rem;right:0.85rem;z-index:9999;display:flex;flex-direction:column;gap:0.42rem;pointer-events:none}
+.toast{background:rgba(3,6,13,0.97);backdrop-filter:blur(20px);border:1px solid var(--bd);border-radius:10px;padding:0.62rem 0.95rem;display:flex;align-items:center;gap:0.48rem;font-size:0.78rem;min-width:175px;max-width:275px;pointer-events:all;animation:tIn 0.3s var(--spring)}
+.toast.out{animation:tOut 0.24s var(--ease) forwards}
+.toast.ok{border-left:3px solid var(--gr2)}.toast.err{border-left:3px solid var(--r)}.toast.info{border-left:3px solid var(--c)}
+@keyframes tIn{from{opacity:0;transform:translateX(15px) scale(0.9)}to{opacity:1;transform:translateX(0) scale(1)}}
+@keyframes tOut{to{opacity:0;transform:translateX(15px)}}
+
+/* ===== ALERT ===== */
+.alert{border-radius:var(--r3);padding:0.58rem 0.85rem;font-size:0.77rem;margin-bottom:0.78rem;display:none}
+.alert.on{display:block}
+.ae{background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.26);color:var(--r);animation:shake 0.35s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+/* ===== EMPTY ===== */
+.empty{text-align:center;padding:2.5rem 1rem;color:var(--t2)}
+.empty-i{font-size:2rem;margin-bottom:0.5rem;opacity:0.45}
+
+/* ===== SPINNER ===== */
+.spin-sm{width:13px;height:13px;border:2px solid rgba(3,6,13,0.4);border-top-color:#03060d;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;vertical-align:middle;margin-right:5px}
 </style>
 </head>
 <body>
-<div class="bg-canvas"><div class="particles"></div><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+<div class="bg"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
 
 <!-- Loader -->
-<div class="loader" id="loader">
-  <img src="https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png" class="loader-logo" alt="MITV">
-  <div class="loader-ring"></div>
-  <div class="loader-txt">Dashboard Loading...</div>
-  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+<div id="ldr">
+  <img src="https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png" class="li" alt="MITV">
+  <div class="lr"></div>
+  <div class="lt">LOADING</div>
 </div>
 
 <!-- PIN Overlay -->
-<div class="pin-overlay" id="pinOverlay">
+<div class="pin-ov" id="pinOv">
   <div class="pin-box">
-    <div class="gold-bar"></div>
-    <img src="https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png" style="width:48px;display:block;margin:0 auto .8rem;filter:drop-shadow(0 0 12px rgba(240,180,41,.5))">
-    <div style="font-family:var(--fh);font-size:.8rem;letter-spacing:2px;color:var(--gold)">SECURITY PIN</div>
-    <div style="font-size:.74rem;color:var(--text2);margin-top:.25rem">4-digit PIN darj karein</div>
-    <div class="pin-dots"><div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div><div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div></div>
-    <div class="pin-grid" id="pinGrid"></div>
-    <div id="pinErr" style="color:var(--red);font-size:.74rem;margin-top:.65rem;min-height:1.1em;text-align:center"></div>
-    <button class="btn btn-glass btn-sm" style="width:100%;margin-top:.9rem" onclick="skipPin()">⏭ First Time Setup</button>
-  </div>
-</div>
-
-<!-- Success Modal -->
-<div class="overlay" id="successModal">
-  <div class="modal">
-    <div class="modal-head"><div class="modal-title">✅ Client Deploy!</div><button class="modal-close" onclick="closeModal('successModal')">✕</button></div>
-    <div class="modal-body" id="successBody"></div>
-    <div class="modal-foot"><button class="btn btn-glass btn-sm" onclick="closeModal('successModal')">Close</button><button class="btn btn-green btn-sm" id="waBtn">📲 WhatsApp</button></div>
+    <img src="https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png" style="width:44px;display:block;margin:0 auto 0.7rem;filter:drop-shadow(0 0 12px rgba(240,180,41,0.6))">
+    <div style="font-family:'Orbitron',monospace;font-size:0.68rem;letter-spacing:2px;color:var(--g);text-align:center">PIN DARJ KAREIN</div>
+    <div class="pin-dots">
+      <div class="pd" id="pd0"></div><div class="pd" id="pd1"></div>
+      <div class="pd" id="pd2"></div><div class="pd" id="pd3"></div>
+    </div>
+    <div class="pgrid" id="pgrid"></div>
+    <div id="perr" style="font-size:0.7rem;color:var(--r);text-align:center;min-height:1em;margin-top:0.55rem"></div>
+    <button onclick="skipP()" style="width:100%;margin-top:0.72rem;padding:0.55rem;background:rgba(255,255,255,0.04);border:1px solid var(--bd);border-radius:var(--r3);color:var(--t2);font-size:0.7rem;cursor:pointer;font-family:'Inter',sans-serif">⏭ Pehli Baar Skip</button>
   </div>
 </div>
 
 <!-- Client Detail Modal -->
-<div class="overlay" id="clientModal">
-  <div class="modal">
-    <div class="modal-head"><div class="modal-title">👤 Client Detail</div><button class="modal-close" onclick="closeModal('clientModal')">✕</button></div>
-    <div class="modal-body" id="clientBody"></div>
-    <div class="modal-foot" id="clientFoot"></div>
+<div class="mo-ov" id="moD">
+  <div class="mo-box">
+    <div class="mo-hd"><div class="mo-ttl">👤 Client Detail</div><button class="mo-cl" onclick="cM('moD')">✕</button></div>
+    <div class="mo-body" id="moDB"></div>
+    <div class="mo-foot" id="moDFt"></div>
   </div>
 </div>
 
+<!-- Success Modal -->
+<div class="mo-ov" id="moS">
+  <div class="mo-box">
+    <div class="mo-hd"><div class="mo-ttl">✅ Client Deployed!</div><button class="mo-cl" onclick="cM('moS')">✕</button></div>
+    <div class="mo-body" id="moSB"></div>
+    <div class="mo-foot">
+      <button class="btn bg-ghost bsm" onclick="cM('moS')">Close</button>
+      <button class="btn bg-green bsm" id="waBtn">📲 WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toasts -->
+<div id="toasts"></div>
+
 <!-- PWA Banner -->
-
-
-<div id="toastBox"></div>
-
+<!-- App -->
 <div class="app">
   <!-- Topbar -->
   <div class="topbar">
-    <div class="topbar-logo">
-      <img src="https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png" alt="MITV">
-      <div><div class="topbar-title">MITV</div><div class="topbar-sub" id="topSub">Reseller Portal</div></div>
+    <div class="tb-left">
+      <img src="https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png" class="tb-img" alt="MITV">
+      <span class="tb-name">MITV</span>
     </div>
-    <div class="topbar-right">
-      <div class="dot-on" id="netDot"></div>
-      <div class="clock" id="clock">--:--</div>
-      <button id="sndBtn" onclick="toggleSound()" style="background:none;border:none;color:var(--text2);font-size:1rem;cursor:pointer">🔊</button>
-    </div>
-  </div>
-
-  <!-- PAGE: HOME -->
-  <div class="page active" id="pg-home">
-    <div class="stats stagger a-up" id="statsGrid">
-      <div class="stat sg"><div class="stat-ico">👥</div><div class="stat-n cn" id="s-total">—</div><div class="stat-l">Total Clients</div><div class="stat-ghost">👥</div></div>
-      <div class="stat sgg"><div class="stat-ico">✅</div><div class="stat-n cg" id="s-paid">—</div><div class="stat-l">Paid Active</div><div class="stat-ghost">✅</div></div>
-      <div class="stat sr"><div class="stat-ico">🚫</div><div class="stat-n cr" id="s-blocked">—</div><div class="stat-l">Blocked</div><div class="stat-ghost">🚫</div></div>
-      <div class="stat sb"><div class="stat-ico">💰</div><div class="stat-n cb" id="s-rev">—</div><div class="stat-l">Monthly Est.</div><div class="stat-ghost">💰</div></div>
-    </div>
-
-    <div class="rev-grid">
-      <div class="rev-card"><div class="rev-lbl">Is Mahine</div><div class="rev-val" id="r-month">—</div><div class="rev-sub">Paid × Rs300</div></div>
-      <div class="rev-card"><div class="rev-lbl">Total (Est.)</div><div class="rev-val" id="r-total">—</div><div class="rev-sub">Setup + Monthly</div></div>
-    </div>
-
-    <div class="sec-hdr"><div class="sec-ttl">📋 Recent Clients</div><button class="btn btn-outline btn-sm" onclick="goPage('clients')">Sab →</button></div>
-    <div class="tbl-wrap">
-      <div class="tbl-head cols3"><span>Name</span><span>Phone</span><span>Status</span></div>
-      <div id="recentList"><div style="text-align:center;padding:2rem"><div class="spin spin-lg"></div></div></div>
+    <div class="tb-right">
+      <span class="tb-user" id="tbU">—</span>
+      <div class="dot" id="netDot"></div>
+      <button onclick="tglSnd()" id="sndBtn" style="background:none;border:none;color:var(--t2);cursor:pointer;font-size:0.9rem;padding:0.15rem;line-height:1">🔊</button>
     </div>
   </div>
 
-  <!-- PAGE: CLIENTS -->
-  <div class="page" id="pg-clients">
-    <div class="sec-hdr">
-      <div class="sec-ttl">👥 My Clients</div>
-      <div class="search-wrap"><input type="text" class="search-input" id="clientSearch" placeholder="Search..." oninput="filterClients()"></div>
-    </div>
-    <div class="tbl-wrap">
-      <div class="tbl-head cols5"><span>Name</span><span>Phone</span><span class="hide-s">UID</span><span>Status</span><span>Action</span></div>
-      <div id="allClients"><div style="text-align:center;padding:2rem"><div class="spin spin-lg"></div></div></div>
-    </div>
-  </div>
+  <!-- Scroll area -->
+  <div class="scroll" id="scrl">
 
-  <!-- PAGE: ADD CLIENT -->
-  <div class="page" id="pg-add">
-    <div class="sec-hdr"><div class="sec-ttl">➕ Add Client</div></div>
-    <div class="add-form card">
-      <div class="gold-bar"></div>
-      <div style="padding-top:.5rem">
-        <div class="form-group"><label class="form-label">Client Ka Naam *</label><div class="icon-wrap"><span class="fi">👤</span><input type="text" class="form-input" id="nc-name" placeholder="Muhammad Ahmed"></div></div>
-        <div class="form-group"><label class="form-label">WhatsApp / Phone *</label><div class="icon-wrap"><span class="fi">📞</span><input type="tel" class="form-input" id="nc-phone" placeholder="03XX-XXXXXXX"></div></div>
-        <div class="cost-preview">
-          <div class="cost-title">💰 COST BREAKDOWN</div>
-          <div class="cost-row"><span class="cl">Monthly Fee</span><span class="cv">Rs 300</span></div>
-          <div class="cost-row"><span class="cl">Setup (One Time)</span><span class="cv">Rs 100</span></div>
-          <div class="cost-row cost-total"><span class="cl" style="font-weight:700;color:var(--gold2)">1st Month Total</span><span class="cv" style="font-size:1rem">Rs 400</span></div>
-        </div>
-        <div id="addErr" style="display:none;background:rgba(255,68,102,.1);border:1px solid rgba(255,68,102,.25);border-radius:9px;padding:.62rem .9rem;color:var(--red);font-size:.8rem;margin-bottom:.8rem"></div>
-        <button class="btn btn-gold btn-full" id="addBtn" onclick="addClient()" style="padding:.92rem;font-size:.93rem;letter-spacing:1.5px">⚡ DEPLOY CLIENT</button>
+    <!-- HOME -->
+    <div class="pg on" id="pg-home">
+      <div style="display:flex;align-items:center;gap:0.6rem;padding:0.2rem 0 0.75rem">
+        <div style="flex:1"><div style="font-size:0.68rem;color:var(--t2)">Assalam o Alaikum,</div><div style="font-size:1rem;font-weight:700" id="hWel">—</div></div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.68rem;color:var(--t2)" id="hClk">--:--</div>
       </div>
-    </div>
-  </div>
-
-  <!-- PAGE: CHAT -->
-  <div class="page" id="pg-chat">
-    <div class="sec-hdr"><div class="sec-ttl">💬 Admin Chat</div></div>
-    <div class="chat-panel">
-      <div class="chat-head">
-        <div class="msg-av av-admin">👑</div>
-        <div style="flex:1"><div style="font-weight:700;font-size:.9rem">Muaaz Iqbal</div><div style="font-size:.7rem;color:var(--text2)">Admin — Kasur, Punjab</div></div>
-        <div class="dot-on" id="adminDot"></div>
+      <div class="sg">
+        <div class="card lg sc"><div class="sc-i">👥</div><div class="sc-n cg" id="stT">—</div><div class="sc-l">Clients</div><div class="sc-g">👥</div></div>
+        <div class="card lc sc"><div class="sc-i">✅</div><div class="sc-n cc" id="stP">—</div><div class="sc-l">Paid</div><div class="sc-g">✅</div></div>
+        <div class="card lr2 sc"><div class="sc-i">🚫</div><div class="sc-n cr" id="stB">—</div><div class="sc-l">Blocked</div><div class="sc-g">🚫</div></div>
+        <div class="card lgr sc"><div class="sc-i">💰</div><div class="sc-n cgr" id="stR">—</div><div class="sc-l">Monthly</div><div class="sc-g">💰</div></div>
       </div>
-      <div class="chat-body"><div class="chat-msgs" id="chatMsgs"></div></div>
-      <div class="chat-foot">
-        <textarea class="chat-in" id="chatIn" placeholder="Admin ko message..." rows="1" onkeydown="chatKey(event)"></textarea>
-        <button class="btn btn-gold" onclick="sendMsg()" style="padding:.62rem .9rem;font-size:1.1rem">➤</button>
+      <div class="card lg" style="margin-bottom:0.9rem">
+        <div class="rev-row"><span class="rl">Monthly (Paid × Rs 300)</span><span class="rv" id="rM">—</span></div>
+        <div class="rev-row"><span class="rl" style="color:var(--g2);font-weight:600">Total Estimated</span><span class="rv big" id="rT">—</span></div>
       </div>
+      <div class="sh"><div class="sht">📋 Recent</div><button class="btn bg-ghost bsm" onclick="gp('clients')">All →</button></div>
+      <div class="card" id="recList"><div class="empty"><div class="empty-i">⏳</div></div></div>
     </div>
-  </div>
 
-  <!-- PAGE: AI -->
-  <div class="page" id="pg-ai">
-    <div class="ai-page">
-      <div class="ai-tag">🤖 MI AI — Groq LLaMA-3 70B</div>
-      <div class="card" style="background:transparent;border:none;box-shadow:none">
-        <div class="chat-msgs" id="aiMsgs" style="min-height:320px;max-height:380px;background:var(--glass);border:1px solid var(--border);border-radius:14px 14px 0 0;padding:1rem">
-          <div class="msg">
-            <div class="msg-av av-ai">🧠</div>
-            <div>
-              <div class="bubble"><strong>MI AI</strong> — MITV Network ka official assistant!<br><br>
-              Mujhse poochhein:<br>
-              • IPTV / M3U issues<br>
-              • Client management<br>
-              • Billing & revenue<br>
-              • Technical support<br>
-              • Kuch bhi! 🚀</div>
-            </div>
+    <!-- CLIENTS -->
+    <div class="pg" id="pg-clients">
+      <div class="srch-wrap"><span class="srch-ic">🔍</span><input class="srch" type="search" id="cF" placeholder="Naam, phone ya UID..." oninput="fC()"></div>
+      <div class="card" id="allList"><div class="empty"><div class="empty-i">⏳</div></div></div>
+    </div>
+
+    <!-- ADD CLIENT -->
+    <div class="pg" id="pg-add">
+      <div class="card lg" style="padding:1.25rem">
+        <div style="font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:2px;color:var(--g);margin-bottom:1rem">➕ NEW CLIENT DEPLOY</div>
+        <div class="alert ae" id="addErr"></div>
+        <div class="fg"><label class="fl">Naam *</label><span class="fic">👤</span><input class="fi" type="text" id="nn" placeholder="Muhammad Ahmed" autocomplete="name"></div>
+        <div class="fg"><label class="fl">WhatsApp / Phone *</label><span class="fic">📞</span><input class="fi" type="tel" id="np" placeholder="03XX-XXXXXXX" inputmode="tel"></div>
+        <div class="cost-box">
+          <div class="cost-t">💰 COST BREAKDOWN</div>
+          <div class="cost-r"><span class="cost-lbl">Monthly Fee</span><span class="cost-val">Rs 300</span></div>
+          <div class="cost-r"><span class="cost-lbl">Setup Fee (1 time)</span><span class="cost-val">Rs 100</span></div>
+          <div class="cost-r" style="border-top:1px solid var(--bd);padding-top:0.35rem;margin-top:0.2rem">
+            <span class="cost-lbl" style="color:var(--g2);font-weight:600">1st Month Total</span>
+            <span class="cost-val" style="font-size:0.95rem">Rs 400</span>
           </div>
         </div>
-        <div style="background:var(--glass);border:1px solid var(--border);border-top:none;border-radius:0 0 14px 14px;padding:.82rem;display:flex;gap:.55rem">
-          <input type="text" class="form-input" id="aiIn" placeholder="Sawal likhein..." onkeydown="if(event.key==='Enter')sendAI()" style="flex:1;padding:.62rem 1rem">
-          <button class="btn btn-gold" onclick="sendAI()" style="padding:.62rem .9rem;font-size:1.1rem">➤</button>
+        <button class="btn bg-gold bfull" id="addBtn" onclick="addCli()" style="padding:0.8rem;font-family:'Orbitron',monospace;font-size:0.72rem;letter-spacing:2.5px;margin-top:0.2rem">⚡ DEPLOY CLIENT</button>
+      </div>
+    </div>
+
+    <!-- CHAT -->
+    <div class="pg no-pad" id="pg-chat">
+      <div class="chat-shell">
+        <div class="chat-hdr">
+          <div class="mav mav-g" style="width:32px;height:32px">👑</div>
+          <div style="flex:1"><div class="chat-hdr-nm">Muaaz Iqbal</div><div class="chat-hdr-sb">Admin · Kasur, Punjab · Realtime</div></div>
+          <div class="dot"></div>
+        </div>
+        <div class="chat-msgs" id="chatMsgs"></div>
+        <div class="chat-foot">
+          <textarea class="chat-ta" id="chatIn" placeholder="Admin ko message..." rows="1" oninput="arSz(this)" onkeydown="ckSend(event)"></textarea>
+          <button class="btn bg-gold sbtn" onclick="sChat()">➤</button>
         </div>
       </div>
-      <div style="text-align:center;margin-top:.65rem">
-        <button class="btn btn-outline btn-sm" onclick="clearAI()">🗑 Clear Chat</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- PAGE: ABOUT -->
-  <div class="page" id="pg-about">
-    <!-- Hero -->
-    <div class="about-hero card">
-      <div class="gold-bar"></div>
-      <img src="https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png" class="about-logo" alt="MITV">
-      <div class="about-name">MITV NETWORK</div>
-      <div class="about-ver">v4.0 Ultra</div>
-      <div class="about-desc">Pakistan ka premium IPTV Reseller Management Platform. Designed for resellers to manage clients, track revenue, and grow their business.</div>
     </div>
 
-    <!-- App Info -->
-    <div class="info-card">
-      <div class="info-row"><div class="info-ico">🏢</div><div class="info-content"><div class="info-lbl">Organization</div><div class="info-val">MUSLIM ISLAM</div></div></div>
-      <div class="info-row"><div class="info-ico">👑</div><div class="info-content"><div class="info-lbl">Founder</div><div class="info-val">Muaaz Iqbal</div></div></div>
-      <div class="info-row"><div class="info-ico">📍</div><div class="info-content"><div class="info-lbl">Location</div><div class="info-val">Kasur, Punjab, Pakistan</div></div></div>
-      <div class="info-row"><div class="info-ico">🌐</div><div class="info-content"><div class="info-lbl">Website</div><div class="info-val">muslimislam.vercel.app</div></div></div>
-      <div class="info-row"><div class="info-ico">📱</div><div class="info-content"><div class="info-lbl">Platform</div><div class="info-val">PWA — Web App (Offline Support)</div></div></div>
-      <div class="info-row"><div class="info-ico">🤖</div><div class="info-content"><div class="info-lbl">AI Engine</div><div class="info-val">Groq LLaMA-3 70B (MI AI)</div></div></div>
-      <div class="info-row"><div class="info-ico">🔥</div><div class="info-content"><div class="info-lbl">Backend</div><div class="info-val">Firebase Realtime Database</div></div></div>
-    </div>
-
-    <!-- Features -->
-    <div class="info-card">
-      <div style="padding:.9rem 1.1rem;border-bottom:1px solid var(--border)"><div style="font-family:var(--fh);font-size:.72rem;color:var(--gold);letter-spacing:2px">⚡ FEATURES</div></div>
-      <div class="info-row"><div class="info-ico">👥</div><div class="info-content"><div class="info-val">Client Management & M3U Deploy</div></div></div>
-      <div class="info-row"><div class="info-ico">💰</div><div class="info-content"><div class="info-val">Revenue Tracking (Rs 300/month)</div></div></div>
-      <div class="info-row"><div class="info-ico">💬</div><div class="info-content"><div class="info-val">Real-time Chat with Admin</div></div></div>
-      <div class="info-row"><div class="info-ico">🧠</div><div class="info-content"><div class="info-val">MI AI Assistant (LLaMA-3)</div></div></div>
-      <div class="info-row"><div class="info-ico">📲</div><div class="info-content"><div class="info-val">WhatsApp Auto-activation Message</div></div></div>
-      <div class="info-row"><div class="info-ico">🔒</div><div class="info-content"><div class="info-val">4-digit PIN Security Lock</div></div></div>
-    </div>
-
-    <!-- PWA Install -->
-    <div class="card" style="padding:1.3rem;margin-bottom:.85rem">
-      <div class="gold-bar"></div>
-      <div style="display:flex;align-items:center;gap:.9rem;padding-top:.3rem">
-        <img src="https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png" style="width:48px;height:48px;border-radius:12px;filter:drop-shadow(0 0 10px rgba(240,180,41,.4))">
-        <div>
-          <div style="font-family:var(--fh);font-size:.76rem;color:var(--gold);letter-spacing:1px">MITV APP INSTALL</div>
-          <div style="font-size:.76rem;color:var(--text2);margin-top:.2rem">Home screen pe add karein — offline support, fast access</div>
+    <!-- AI -->
+    <div class="pg no-pad" id="pg-ai">
+      <div class="chat-shell">
+        <div class="chat-hdr">
+          <div class="mav mav-p" style="width:32px;height:32px">🧠</div>
+          <div style="flex:1"><div class="chat-hdr-nm">MI AI</div><div class="chat-hdr-sb" style="color:var(--p)">Groq llama-3.3-70b-versatile · Streaming</div></div>
+          <button class="btn bg-ghost bsm" onclick="clrAI()">🗑</button>
+        </div>
+        <div class="chat-msgs" id="aiMsgs"></div>
+        <div class="chat-foot">
+          <textarea class="chat-ta" id="aiIn" placeholder="Kuch bhi poochho..." rows="1" oninput="arSz(this)" onkeydown="akSend(event)"></textarea>
+          <button class="btn bg-purple sbtn" onclick="sAI()">➤</button>
         </div>
       </div>
-      <button class="btn btn-gold btn-full pwa-install-btn" onclick="installPWA()">📲 Install MITV App</button>
     </div>
 
-    <!-- Change PIN -->
-    <div class="card" style="padding:1.3rem;margin-bottom:.85rem">
-      <div style="font-family:var(--fh);font-size:.74rem;color:var(--gold);letter-spacing:2px;margin-bottom:1rem">🔒 CHANGE PIN</div>
-      <div class="pin-field-row">
-        <div><label class="form-label">New PIN</label><input type="password" maxlength="4" class="form-input" id="newPin" placeholder="••••" style="text-align:center;letter-spacing:6px;font-size:1.2rem"></div>
-        <div><label class="form-label">Confirm PIN</label><input type="password" maxlength="4" class="form-input" id="confirmPin" placeholder="••••" style="text-align:center;letter-spacing:6px;font-size:1.2rem"></div>
+    <!-- ABOUT -->
+    <div class="pg" id="pg-about">
+      <!-- Profile -->
+      <div class="card lg" style="padding:1.2rem;margin-bottom:0.85rem;text-align:center">
+        <img src="https://i.ibb.co/Xxpt0B54/IMG-20260415-223746-removebg-preview.png" style="width:56px;height:56px;object-fit:contain;display:block;margin:0 auto 0.6rem;filter:drop-shadow(0 0 14px rgba(240,180,41,0.6))">
+        <div style="font-family:'Orbitron',monospace;font-size:1.05rem;font-weight:900;letter-spacing:3px;background:linear-gradient(90deg,var(--g3),var(--g2),var(--c));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">MITV NETWORK</div>
+        <div style="font-size:0.65rem;color:var(--t2);margin-top:0.28rem;letter-spacing:2px">RESELLER PORTAL v5.0</div>
       </div>
-      <button class="btn btn-outline btn-full" onclick="changePin()">🔒 PIN Update Karein</button>
+      <!-- Account -->
+      <div class="sh"><div class="sht">👤 My Account</div></div>
+      <div class="card lc" style="margin-bottom:0.85rem;padding:0.3rem 0.9rem">
+        <div class="about-row"><span class="about-ic">🧑‍💼</span><div><div class="about-lbl">Name</div><div class="about-val" id="abN">—</div></div></div>
+        <div class="about-row"><span class="about-ic">🆔</span><div><div class="about-lbl">Reseller ID</div><div class="about-val" id="abI" style="font-family:'Fira Code',monospace;font-size:0.78rem;color:var(--bl)">—</div></div></div>
+        <div class="about-row"><span class="about-ic">📞</span><div><div class="about-lbl">Phone</div><div class="about-val" id="abP">—</div></div></div>
+      </div>
+      <!-- Revenue -->
+      <div class="sh"><div class="sht">💰 Revenue</div></div>
+      <div class="card lg" style="margin-bottom:0.85rem">
+        <div class="rev-row"><span class="rl">Monthly (Paid × Rs 300)</span><span class="rv" id="abRM">—</span></div>
+        <div class="rev-row"><span class="rl">Setup (Total × Rs 100)</span><span class="rv" id="abRS">—</span></div>
+        <div class="rev-row"><span class="rl" style="color:var(--g2);font-weight:600">Total Estimated</span><span class="rv big" id="abRT">—</span></div>
+      </div>
+      <!-- PWA Install -->
+      <div class="sh"><div class="sht">📲 App Install</div></div>
+      <div class="card lp" style="margin-bottom:0.85rem;padding:1.1rem">
+        <div style="display:flex;align-items:center;gap:0.85rem;margin-bottom:0.85rem">
+          <span style="font-size:1.8rem">📱</span>
+          <div style="flex:1"><div style="font-weight:600;font-size:0.86rem">MITV App Install Karein</div><div style="font-size:0.72rem;color:var(--t2);margin-top:0.18rem">Home screen pe fast access, offline support</div></div>
+        </div>
+        <button class="btn bg-purple bfull" onclick="doInstall()" id="pwaBtn" style="font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:1.5px">📲 INSTALL NOW</button>
+        <div id="pwaOk" style="display:none;text-align:center;font-size:0.76rem;color:var(--gr2);margin-top:0.65rem">✅ Already installed ya browser mein hai</div>
+      </div>
+      <!-- About MITV -->
+      <div class="sh"><div class="sht">ℹ️ About MITV</div></div>
+      <div class="card" style="margin-bottom:0.85rem;padding:0.3rem 0.9rem">
+        <div class="about-row"><span class="about-ic">🏢</span><div><div class="about-lbl">Organization</div><div class="about-val">MUSLIM ISLAM</div></div></div>
+        <div class="about-row"><span class="about-ic">👑</span><div><div class="about-lbl">Founder</div><div class="about-val">Muaaz Iqbal</div><div class="about-sub">Born Nov 28, 2009 · Kasur, Punjab, Pakistan</div></div></div>
+        <div class="about-row"><span class="about-ic">🎓</span><div><div class="about-lbl">Education</div><div class="about-val">ICS 1st Year</div><div class="about-sub">Govt Islamia Graduate College, Kasur</div></div></div>
+        <div class="about-row"><span class="about-ic">📖</span><div><div class="about-lbl">Upcoming Book</div><div class="about-val">The Dajjali Matrix</div></div></div>
+        <div class="about-row"><span class="about-ic">🤖</span><div><div class="about-lbl">AI Engine</div><div class="about-val">Groq llama-3.3-70b-versatile</div><div class="about-sub">Streaming · 3-Key Auto Rotation</div></div></div>
+        <div class="about-row"><span class="about-ic">🔥</span><div><div class="about-lbl">Firebase</div><div class="about-val" style="font-family:'Fira Code',monospace;font-size:0.78rem">ramadan-2385b</div></div></div>
+        <div class="about-row"><span class="about-ic">🌐</span><div><div class="about-lbl">Vercel</div><div class="about-val" style="font-family:'Fira Code',monospace;font-size:0.78rem">mitv-tan.vercel.app</div></div></div>
+      </div>
+      <!-- Logout -->
+      <button class="btn bg-red bfull" onclick="doLogout()" style="margin-bottom:1.5rem;padding:0.8rem;font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:2px">🚪 LOGOUT</button>
     </div>
 
-    <!-- Logout -->
-    <button class="btn btn-red btn-full" onclick="logout()" style="padding:.9rem;font-size:.9rem;letter-spacing:1px">🚪 Logout</button>
+  </div><!-- /scroll -->
+
+  <!-- Bottom Nav -->
+  <div class="bnav">
+    <button class="bni on" data-pg="home"    onclick="gp('home')"><span class="bni-ic">🏠</span><span class="bni-lb">Home</span></button>
+    <button class="bni"    data-pg="clients" onclick="gp('clients')"><span class="bni-ic">👥</span><span class="bni-lb">Clients</span></button>
+    <button class="bni"    data-pg="add"     onclick="gp('add')"><span class="bni-ic">➕</span><span class="bni-lb">Add</span></button>
+    <button class="bni"    data-pg="chat"    onclick="gp('chat')"><span class="bni-ic">💬</span><span class="bni-lb">Chat</span></button>
+    <button class="bni"    data-pg="ai"      onclick="gp('ai')"><span class="bni-ic">🧠</span><span class="bni-lb">AI</span></button>
+    <button class="bni"    data-pg="about"   onclick="gp('about')"><span class="bni-ic">👤</span><span class="bni-lb">About</span></button>
   </div>
 </div>
 
-<!-- Bottom Nav -->
-<nav class="bottom-nav">
-  <button class="nav-btn active" id="nb-home" onclick="goPage('home')"><span class="nav-ico">🏠</span><span class="nav-lbl">Home</span></button>
-  <button class="nav-btn" id="nb-clients" onclick="goPage('clients')"><span class="nav-ico">👥</span><span class="nav-lbl">Clients</span></button>
-  <button class="nav-btn" id="nb-add" onclick="goPage('add')"><span class="nav-ico">➕</span><span class="nav-lbl">Add</span></button>
-  <button class="nav-btn" id="nb-chat" onclick="goPage('chat')"><span class="nav-ico">💬</span><span class="nav-lbl">Chat</span></button>
-  <button class="nav-btn" id="nb-ai" onclick="goPage('ai')"><span class="nav-ico">🧠</span><span class="nav-lbl">MI AI</span></button>
-  <button class="nav-btn" id="nb-about" onclick="goPage('about')"><span class="nav-ico">ℹ️</span><span class="nav-lbl">About</span></button>
-</nav>
+<script>
+'use strict';
+// ── PWA ──
+if('serviceWorker'in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
 
-<script src="js/sounds.js"></script>
-<script type="module">
-import { initializeApp }    from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-import { getDatabase, ref, get, set, update, remove, push, onValue, off }
-  from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
-import { firebaseConfig, showToast, formatTs, timeAgo, genUID, esc, startClock,
-         waPost, revenue, PRICING, regSW, openModal, closeModal, copyText } from './js/firebase-config.js';
-import { groqChat } from './js/groq-ai.js';
+// ── SESSION ──
+const _ss=sessionStorage.getItem('ms')||localStorage.getItem('mitv_s');
+if(!_ss){location.replace('index.html')}
+let SESSION; try{SESSION=JSON.parse(_ss)}catch(e){location.replace('index.html')}
+if(!SESSION?.id){location.replace('index.html')}
+const RID=SESSION.id, RNAME=SESSION.name||'Reseller';
 
-const app=initializeApp(firebaseConfig), db=getDatabase(app);
-regSW();
-
-// ── SESSION ──────────────────────────────────────────────────
-const ss=sessionStorage.getItem('mitv_reseller')||localStorage.getItem('mitv_session');
-if(!ss){location.href='index.html'}
-const session=JSON.parse(ss);
-if(!session?.id){location.href='index.html'}
-const RID=session.id, RNAME=session.name||'Reseller';
-
-let clients={}, aiHistory=[];
-
-// ── INIT ─────────────────────────────────────────────────────
-setTimeout(()=>document.getElementById('loader').classList.add('hide'),1800);
-document.getElementById('topSub').textContent=RNAME;
-startClock('clock');
-
-// Network dot
-window.addEventListener('online', ()=>document.getElementById('netDot').classList.remove('dot-off'));
-window.addEventListener('offline',()=>document.getElementById('netDot').classList.add('dot-off'));
-
-// ── PIN ───────────────────────────────────────────────────────
-let pinBuf='';
-const PIN_KEY=`mitv_pin_${RID}`, savedPin=localStorage.getItem(PIN_KEY);
-const keys=['1','2','3','4','5','6','7','8','9','⌫','0','✓'];
-document.getElementById('pinGrid').innerHTML=keys.map(k=>`<button class="pin-key ${k==='⌫'?'del':k==='✓'?'ok':''}" onclick="pinPress('${k}')">${k}</button>`).join('');
-
-if(savedPin) document.getElementById('pinOverlay').classList.add('show');
-else initDash();
-
-window.pinPress=k=>{
-  playSound('pin');
-  if(k==='⌫') pinBuf=pinBuf.slice(0,-1);
-  else if(k==='✓'){checkPin();return}
-  else if(pinBuf.length<4) pinBuf+=k;
-  updateDots();
-  if(pinBuf.length===4) setTimeout(checkPin,110);
+// ── FIREBASE CONFIG ── (⚠️ Replace YOUR_ values)
+const FB_CFG={
+  apiKey:"YOUR_FIREBASE_API_KEY",
+  authDomain:"ramadan-2385b.firebaseapp.com",
+  databaseURL:"https://ramadan-2385b-default-rtdb.firebaseio.com",
+  projectId:"ramadan-2385b",
+  storageBucket:"ramadan-2385b.appspot.com",
+  messagingSenderId:"YOUR_SENDER_ID",
+  appId:"YOUR_APP_ID"
 };
-function updateDots(){for(let i=0;i<4;i++){const d=document.getElementById('pd'+i);d.classList.toggle('on',i<pinBuf.length);d.classList.remove('err')}}
-function checkPin(){
-  if(pinBuf===savedPin){playSound('pinOk');document.getElementById('pinOverlay').classList.remove('show');initDash()}
-  else{playSound('pinWrong');[0,1,2,3].forEach(i=>{const d=document.getElementById('pd'+i);d.classList.add('err');d.classList.remove('on')});document.getElementById('pinErr').textContent='❌ Galat PIN.';pinBuf='';setTimeout(()=>{updateDots();document.getElementById('pinErr').textContent=''},1200)}
+
+// ── GROQ CONFIG ── latest model
+const GROQ_KEYS=[
+  "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",
+  // "gsk_KEY2",
+  // "gsk_KEY3",
+];
+const GROQ_MODEL="llama-3.3-70b-versatile"; // ✅ Latest & fastest
+let gKI=0;
+
+const GROQ_SYS=`You are MI AI, the official AI of MiTV Network by MUSLIM ISLAM.
+Founder: Muaaz Iqbal (born Nov 28, 2009), Kasur, Punjab, Pakistan.
+Organization: MUSLIM ISLAM. Project: MiTV Network (IPTV ecosystem).
+Tech stack: Python, Firebase Realtime DB, Vercel Serverless, Android, Telegram Bot.
+Firebase: ramadan-2385b. Vercel: mitv-tan.vercel.app.
+Partners: Kabeer Ansari, Ali Ahmad. Book: "The Dajjali Matrix".
+Personality: Intelligent, warm, loyal. Respond in Roman Urdu + English mix naturally.
+Use emojis. Short for simple questions, detailed for complex ones.
+Topics: IPTV, M3U, Firebase, Python, Telegram bots, Android, Islamic topics, business.`;
+
+// ── SOUNDS ──
+let sOn=true, _ac=null;
+function gAC(){if(!_ac)try{_ac=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}; if(_ac?.state==='suspended')_ac.resume(); return _ac}
+function tn(f,d,g,dl){if(!sOn)return;const c=gAC();if(!c)return;try{const o=c.createOscillator(),gn=c.createGain();o.connect(gn);gn.connect(c.destination);o.frequency.value=f;const t=c.currentTime+(dl||0);gn.gain.setValueAtTime(0,t);gn.gain.linearRampToValueAtTime(g||0.18,t+0.01);gn.gain.exponentialRampToValueAtTime(0.001,t+(d||0.08));o.start(t);o.stop(t+(d||0.08)+0.05)}catch(e){}}
+const S={click:()=>{tn(800,0.05,0.17);tn(600,0.04,0.11,0.03)},ok:()=>{[523,659,784].forEach((f,i)=>tn(f,0.1,0.19,i*0.09))},err:()=>{tn(240,0.12,0.19);tn(170,0.1,0.14,0.1)},nav:()=>tn(560,0.07,0.12),send:()=>{tn(640,0.06,0.14);tn(900,0.05,0.1,0.06)},recv:()=>{tn(880,0.05,0.12);tn(1100,0.04,0.08,0.06)},pin:()=>tn(700+Math.random()*180,0.05,0.14),pinok:()=>{tn(784,0.08,0.2);tn(988,0.08,0.2,0.09)},pinerr:()=>{tn(220,0.12,0.19);tn(170,0.1,0.14,0.1)},deploy:()=>{[440,550,660,880].forEach((f,i)=>tn(f,0.1,0.18,i*0.07))}};
+function ps(n){try{S[n]&&S[n]()}catch(e){}}
+function tglSnd(){sOn=!sOn;document.getElementById('sndBtn').textContent=sOn?'🔊':'🔇';toast(sOn?'🔊 Sound on':'🔇 Sound off','info',1500)}
+document.addEventListener('click',()=>gAC(),{once:true});
+
+// ── TOAST ──
+function toast(msg,type,ms){
+  const c=document.getElementById('toasts'),t=document.createElement('div');
+  t.className='toast '+(type||'info');
+  t.innerHTML='<span>'+({ok:'✅',err:'❌',info:'ℹ️'}[type]||'•')+'</span><span>'+msg+'</span>';
+  c.appendChild(t); ps(type==='ok'?'ok':type==='err'?'err':'nav');
+  setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),250)},ms||3000);
 }
-window.skipPin=()=>{localStorage.setItem(PIN_KEY,'0000');document.getElementById('pinOverlay').classList.remove('show');showToast('PIN "0000" set. About > Change PIN se badlein','info',5000);initDash()};
 
-window.changePin=()=>{
-  const np=document.getElementById('newPin').value.trim(), cp=document.getElementById('confirmPin').value.trim();
-  if(np.length<4||!/^\d{4}$/.test(np)){showToast('⚠️ 4 digits ka PIN chaiye','warn');return}
-  if(np!==cp){showToast('❌ PINs match nahi karte','error');return}
-  localStorage.setItem(PIN_KEY,np);
-  document.getElementById('newPin').value='';document.getElementById('confirmPin').value='';
-  playSound('success');showToast('✅ PIN change ho gaya!','success');
-};
+// ── MODAL ──
+function oM(id){ps('click');document.getElementById(id).classList.add('on')}
+function cM(id){document.getElementById(id).classList.remove('on')}
+document.querySelectorAll('.mo-ov').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('on')}));
 
-// ── INIT DASHBOARD ────────────────────────────────────────────
-function initDash(){
-  onValue(ref(db,`clients/${RID}`),snap=>{clients=snap.val()||{};renderStats();renderRecent();renderAll()});
+// ── UTILS ──
+function esc(s){const d=document.createElement('div');d.appendChild(document.createTextNode(String(s??'')));return d.innerHTML}
+function tAgo(ms){if(!ms)return'—';const d=Date.now()-ms,m=Math.floor(d/60000),h=Math.floor(d/3600000),dd=Math.floor(d/86400000);if(m<1)return'Abhi';if(m<60)return m+'m';if(h<24)return h+'h';return dd+'d'}
+function gUID(p){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let r='';for(let i=0;i<5;i++)r+=c[Math.floor(Math.random()*c.length)];return(p||'MITV')+'-'+r}
+function cpTxt(text,btn){
+  navigator.clipboard.writeText(text).then(()=>{
+    toast('📋 Copy ho gaya!','ok',1800);
+    if(btn){const o=btn.innerHTML;btn.innerHTML='✅';btn.classList.add('done');setTimeout(()=>{btn.innerHTML=o;btn.classList.remove('done')},2000)}
+  }).catch(()=>toast('Copy error','err'))
+}
+function waPost(nm,ph,m3u,uid){
+  return`🌟 MITV NETWORK 🌟\n✅ Account Activation!\n\nAssalam o Alaikum! ✨\n*${nm}*, aapka MITV account active ho gaya! 🎉\n\n📋 Details:\n👤 ${nm}\n📞 ${ph}\n🆔 ${uid}\n🔗 M3U:\n${m3u}\n\n📲 App: https://mitvnet.vercel.app/mitvnet.apk\n\n🏢 MUSLIM ISLAM | 👑 Muaaz Iqbal (Kasur)\nShukriya! ❤️`
+}
+function arSz(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,88)+'px'}
+
+// ── PIN ──
+const PIN_K='mitv_pin_'+RID;
+let pBuf='', savedPIN=localStorage.getItem(PIN_K);
+if(savedPIN) document.getElementById('pinOv').classList.add('on');
+
+const PK_KEYS=['1','2','3','4','5','6','7','8','9','⌫','0','✓'];
+document.getElementById('pgrid').innerHTML=PK_KEYS.map(k=>`<button class="pk${k==='⌫'?' del':k==='✓'?' ok':''}" data-k="${k}">${k}</button>`).join('');
+document.getElementById('pgrid').addEventListener('click',e=>{const k=e.target.closest('.pk')?.dataset.k;if(k)doPIN(k)});
+
+function doPIN(k){
+  ps('pin');
+  if(k==='⌫')pBuf=pBuf.slice(0,-1);
+  else if(k==='✓'){chkPIN();return}
+  else if(pBuf.length<4)pBuf+=k;
+  updDots();
+  if(pBuf.length===4)setTimeout(chkPIN,120);
+}
+function updDots(){for(let i=0;i<4;i++){const d=document.getElementById('pd'+i);if(d){d.classList.toggle('on',i<pBuf.length);d.classList.remove('er')}}}
+function chkPIN(){
+  if(pBuf===savedPIN){ps('pinok');document.getElementById('pinOv').classList.remove('on');initApp()}
+  else{ps('pinerr');for(let i=0;i<4;i++){const d=document.getElementById('pd'+i);if(d){d.classList.add('er');d.classList.remove('on')}}document.getElementById('perr').textContent='❌ Galat PIN';pBuf='';setTimeout(()=>{updDots();document.getElementById('perr').textContent=''},1200)}
+}
+function skipP(){if(!savedPIN){document.getElementById('pinOv').classList.remove('on');initApp()}}
+
+// ── FIREBASE ──
+let db,ref_,set_,update_,remove_,push_,get_,onValue_;
+async function initFB(){
+  const{initializeApp}=await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js');
+  const FB=await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js');
+  let app;try{const{getApp}=await import('https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js');app=getApp()}catch(e){app=initializeApp(FB_CFG)}
+  db=FB.getDatabase(app);ref_=FB.ref;set_=FB.set;update_=FB.update;remove_=FB.remove;push_=FB.push;get_=FB.get;onValue_=FB.onValue;
+}
+
+// ── STATE ──
+let ALL={}, aiH=[], chatActive=false;
+
+// ── INIT APP ──
+async function initApp(){
+  document.getElementById('ldr').classList.add('hide');
+  // Topbar
+  document.getElementById('tbU').textContent=RNAME;
+  document.getElementById('hWel').textContent=RNAME;
+  document.getElementById('abN').textContent=RNAME;
+  document.getElementById('abI').textContent=RID;
+  document.getElementById('abP').textContent=SESSION.number||'—';
+  // Clock
+  const ck=()=>document.getElementById('hClk').textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
+  ck();setInterval(ck,30000);
+  // Network
+  const nd=document.getElementById('netDot');
+  window.addEventListener('online',()=>nd.classList.remove('offline'));
+  window.addEventListener('offline',()=>nd.classList.add('offline'));
+  // Firebase
+  await initFB();
+  // Realtime clients
+  onValue_(ref_(db,'clients/'+RID),snap=>{
+    ALL=snap.val()||{};
+    updStats();rndRecent();rndAll();
+  });
+  // Chat
   initChat();
+  // AI welcome
+  addAIMsg("Assalam o Alaikum! Main **MI AI** hoon 🧠\n\nMujhse poochh saktay hain:\n• Client management tips\n• IPTV / M3U help\n• Firebase / Python\n• Koi bhi masla! 🚀");
 }
 
-// ── STATS ─────────────────────────────────────────────────────
-function renderStats(){
-  const r=revenue(clients);
-  document.getElementById('s-total').textContent=r.total;
-  document.getElementById('s-paid').textContent=r.paid;
-  document.getElementById('s-blocked').textContent=r.blocked;
-  document.getElementById('s-rev').textContent=`Rs${(r.monthly/1000).toFixed(1)}k`;
-  document.getElementById('r-month').textContent=`Rs ${r.monthly.toLocaleString()}`;
-  document.getElementById('r-total').textContent=`Rs ${r.earned.toLocaleString()}`;
+// ── STATS ──
+function updStats(){
+  const vs=Object.values(ALL);
+  const t=vs.length,p=vs.filter(c=>c.status==='Paid').length,b=t-p;
+  const m=p*300,tot=m+t*100;
+  const el=id=>document.getElementById(id);
+  el('stT').textContent=t; el('stP').textContent=p; el('stB').textContent=b;
+  el('stR').textContent='Rs '+m.toLocaleString();
+  el('rM').textContent='Rs '+m.toLocaleString();
+  el('rT').textContent='Rs '+tot.toLocaleString();
+  el('abRM').textContent='Rs '+m.toLocaleString();
+  el('abRS').textContent='Rs '+(t*100).toLocaleString();
+  el('abRT').textContent='Rs '+tot.toLocaleString();
 }
 
-// ── RENDER ROWS ───────────────────────────────────────────────
-function rows(el,entries){
-  if(!entries.length){document.getElementById(el).innerHTML=`<div style="text-align:center;padding:2.5rem;color:var(--text2)"><div style="font-size:2.5rem;margin-bottom:.5rem">📭</div><div>Koi client nahi. <button class="btn btn-gold btn-sm" onclick="goPage('add')" style="margin-left:.5rem">➕ Add</button></div></div>`;return}
-  document.getElementById(el).innerHTML=entries.map(([uid,c],i)=>{
+// ── RENDER ROWS ──
+function rndRows(elId,entries){
+  const el=document.getElementById(elId);
+  if(!entries.length){
+    el.innerHTML='<div class="empty"><div class="empty-i">📭</div><div>Koi client nahi. <button class="btn bg-gold bsm" onclick="gp(\'add\')" style="margin-left:0.5rem">➕ Add</button></div></div>';
+    return;
+  }
+  el.innerHTML=entries.map(([uid,c],i)=>{
     const paid=c.status==='Paid';
-    return`<div class="tbl-row cols5 ani" style="animation-delay:${i*.04}s">
-      <div class="c-name">${esc(c.name||'—')}</div>
-      <div class="c-mono">${esc(c.phone||'—')}</div>
-      <div class="c-mono hide-s" style="font-size:.68rem">${uid}</div>
-      <div><span class="badge ${paid?'b-paid':'b-block'}">${paid?'✅ Paid':'🚫 Blocked'}</span></div>
-      <div class="acts">
-        <button class="btn btn-outline btn-sm" onclick="openClient('${uid}')">👁</button>
-        <button class="btn ${paid?'btn-red':'btn-green'} btn-sm" onclick="toggleStatus('${uid}','${c.status}')">${paid?'Block':'Unblock'}</button>
-      </div>
-    </div>`;
+    return`<div class="cli" style="animation-delay:${i*0.04}s" onclick="openDet('${uid}')">
+      <div class="cav ${paid?'cav-g':'cav-r'}">${paid?'✅':'🚫'}</div>
+      <div class="cinf"><div class="cnm">${esc(c.name||'—')}</div><div class="csub">${esc(c.phone||'—')}</div></div>
+      <div class="cright">
+        <span class="badge ${paid?'bp':'bb'}">${paid?'Paid':'Block'}</span>
+        <span style="font-family:'Fira Code',monospace;font-size:0.6rem;color:var(--t3)">${uid}</span>
+      </div></div>`;
   }).join('');
 }
-
-function renderRecent(){rows('recentList',Object.entries(clients).slice(-5).reverse())}
-function renderAll(f=''){
-  let e=Object.entries(clients);
-  if(f)e=e.filter(([uid,c])=>(c.name||'').toLowerCase().includes(f)||(c.phone||'').includes(f)||uid.toLowerCase().includes(f));
-  rows('allClients',e);
+function rndRecent(){rndRows('recList',Object.entries(ALL).slice(-5).reverse())}
+function rndAll(f){
+  let e=Object.entries(ALL);
+  if(f)e=e.filter(([uid,c])=>(c.name||'').toLowerCase().includes(f)||(c.phone||'').toLowerCase().includes(f)||uid.toLowerCase().includes(f));
+  rndRows('allList',e);
 }
-window.filterClients=()=>renderAll(document.getElementById('clientSearch').value.toLowerCase());
+function fC(){rndAll(document.getElementById('cF').value.toLowerCase())}
 
-// ── CLIENT DETAIL ──────────────────────────────────────────────
-window.openClient=uid=>{
-  const c=clients[uid]; if(!c) return;
-  const m3u=`https://mitv-tan.vercel.app/api/m3u?user=${uid}`;
+// ── CLIENT DETAIL ──
+function openDet(uid){
+  const c=ALL[uid];if(!c)return;
+  const m3u='https://mitv-tan.vercel.app/api/m3u?user='+uid;
   const paid=c.status==='Paid';
-  document.getElementById('clientBody').innerHTML=`
-    <div class="d-row"><span class="d-lbl">Name</span><div class="d-val">${esc(c.name)}</div></div>
-    <div class="d-row"><span class="d-lbl">Phone</span><div class="d-val">${esc(c.phone)}</div></div>
-    <div class="d-row"><span class="d-lbl">UID</span><div class="d-val" style="font-family:var(--fm);font-size:.78rem;color:var(--blue)">${uid}</div></div>
-    <div class="d-row"><span class="d-lbl">Status</span><div class="d-val"><span class="badge ${paid?'b-paid':'b-block'}">${paid?'✅ Paid':'🚫 Blocked'}</span></div></div>
-    <div class="d-row"><span class="d-lbl">Added</span><div class="d-val" style="color:var(--text2);font-size:.8rem">${timeAgo(c.time)}</div></div>
-    <div class="d-row"><span class="d-lbl">M3U</span>
-      <div class="d-val"><div class="m3u-box"><span class="m3u-link">${m3u}</span><button class="copy-btn" id="cpM3U" onclick="copyText('${m3u}',document.getElementById('cpM3U'))">📋</button></div></div>
-    </div>`;
-  const wa=`https://wa.me/${(c.phone||'').replace(/\D/g,'')}?text=${encodeURIComponent(waPost(c.name,c.phone,m3u,uid))}`;
-  document.getElementById('clientFoot').innerHTML=`
-    <button class="btn btn-red btn-sm" onclick="delClient('${uid}')">🗑 Delete</button>
-    <button class="btn ${paid?'btn-red':'btn-green'} btn-sm" onclick="toggleStatus('${uid}','${c.status}');closeModal('clientModal')">${paid?'🔴 Block':'🟢 Unblock'}</button>
-    <a class="btn btn-green btn-sm" href="${wa}" target="_blank">📲 WA</a>
-    <button class="btn btn-glass btn-sm" onclick="closeModal('clientModal')">Close</button>`;
-  openModal('clientModal');
-};
+  document.getElementById('moDB').innerHTML=`
+    <div class="dr"><div class="dl">Name</div><div class="dv">${esc(c.name||'—')}</div></div>
+    <div class="dr"><div class="dl">Phone</div><div class="dv">${esc(c.phone||'—')}</div></div>
+    <div class="dr"><div class="dl">UID</div><div class="dv mono">${uid}</div></div>
+    <div class="dr"><div class="dl">Status</div><div class="dv"><span class="badge ${paid?'bp':'bb'}">${paid?'✅ Paid':'🚫 Blocked'}</span></div></div>
+    <div class="dr"><div class="dl">Added</div><div class="dv" style="color:var(--t2);font-size:0.78rem">${tAgo(c.time)}</div></div>
+    <div class="dr"><div class="dl">M3U</div><div class="dv">
+      <div class="m3u-box"><span class="m3u-t">${m3u}</span>
+        <button class="cp-btn" id="cpM" onclick="cpTxt('${m3u}',this)">📋</button>
+      </div>
+    </div></div>`;
+  const waNum=(c.phone||'').replace(/\D/g,'');
+  const post=waPost(c.name||'',c.phone||'',m3u,uid);
+  document.getElementById('moDFt').innerHTML=`
+    <button class="btn bg-red bsm" onclick="delCli('${uid}')">🗑</button>
+    <button class="btn ${paid?'bg-red':'bg-green'} bsm" onclick="togCli('${uid}','${c.status}')">
+      ${paid?'🔴 Block':'🟢 Unblock'}</button>
+    <a class="btn bg-green bsm" href="https://wa.me/${waNum}?text=${encodeURIComponent(post)}" target="_blank">📲 WA</a>
+    <button class="btn bg-ghost bsm" onclick="cM('moD')">Close</button>`;
+  oM('moD');
+}
 
-window.toggleStatus=async(uid,cur)=>{
+async function togCli(uid,cur){
   const ns=cur==='Paid'?'Blocked':'Paid';
-  await update(ref(db,`clients/${RID}/${uid}`),{status:ns});
-  await update(ref(db,`master_users/${uid}`),{status:ns,updated_at:Date.now()});
-  showToast(`${uid} → ${ns} ${ns==='Paid'?'✅':'🚫'}`,ns==='Paid'?'success':'warn');
-};
+  await update_(ref_(db,'clients/'+RID+'/'+uid),{status:ns});
+  await update_(ref_(db,'master_users/'+uid),{status:ns,updated_at:Date.now()});
+  toast(uid+' → '+ns,'ok');ps(ns==='Paid'?'ok':'err');cM('moD');
+}
+async function delCli(uid){
+  if(!confirm('Delete karein?'))return;
+  await remove_(ref_(db,'clients/'+RID+'/'+uid));
+  await remove_(ref_(db,'master_users/'+uid));
+  await remove_(ref_(db,'active_playlists/'+uid));
+  cM('moD');toast('Client deleted.','info');ps('err');
+}
 
-window.delClient=async uid=>{
-  if(!confirm(`${uid} permanently delete karein?`)) return;
-  await remove(ref(db,`clients/${RID}/${uid}`));
-  await remove(ref(db,`master_users/${uid}`));
-  await remove(ref(db,`active_playlists/${uid}`));
-  showToast('Client delete ho gaya','info');
-  closeModal('clientModal');
-};
-
-// ── ADD CLIENT ────────────────────────────────────────────────
-window.addClient=async()=>{
-  const name=document.getElementById('nc-name').value.trim();
-  const phone=document.getElementById('nc-phone').value.trim();
-  const errEl=document.getElementById('addErr'), btn=document.getElementById('addBtn');
-  errEl.style.display='none';
-  if(!name||!phone){errEl.textContent='⚠️ Naam aur phone zaroori.';errEl.style.display='block';playSound('error');return}
-  btn.disabled=true;btn.innerHTML='<span class="spin"></span> Deploy ho raha hai...';
+// ── ADD CLIENT ──
+async function addCli(){
+  const nm=document.getElementById('nn').value.trim();
+  const ph=document.getElementById('np').value.trim();
+  const eEl=document.getElementById('addErr'),btn=document.getElementById('addBtn');
+  eEl.classList.remove('on');
+  if(!nm||!ph){eEl.textContent='⚠️ Naam aur phone zaroori hain.';eEl.classList.add('on');ps('err');return}
+  btn.disabled=true;btn.innerHTML='<span class="spin-sm"></span>Deploy...';ps('click');
   try{
-    const uid=genUID('MITV'), ts=Date.now();
-    const m3u=`https://mitv-tan.vercel.app/api/m3u?user=${uid}`;
-    let sources=[];
-    try{const ls=await get(ref(db,'playlist_library'));if(ls.exists())Object.values(ls.val()).forEach(v=>{if(v.url)sources.push(v.url)})}catch{}
-    if(!sources.length)sources=['https://mitvnet.vercel.app/default.m3u'];
-    await set(ref(db,`master_users/${uid}`),{name,phone,status:'Paid',reseller_id:RID,created_at:ts,updated_at:ts});
-    await set(ref(db,`active_playlists/${uid}`),{sources,warningVideo:'https://mitvnet.vercel.app/mipay.mp4',assigned_by:`Reseller_${RID}`,lastUpdate:ts});
-    await set(ref(db,`clients/${RID}/${uid}`),{uid,name,phone,m3u,status:'Paid',time:ts});
-    playSound('deploy');
-    const post=waPost(name,phone,m3u,uid);
-    document.getElementById('successBody').innerHTML=`
-      <div class="d-row"><span class="d-lbl">UID</span><div class="d-val" style="font-family:var(--fm);color:var(--blue)">${uid}</div></div>
-      <div class="d-row"><span class="d-lbl">Name</span><div class="d-val">${esc(name)}</div></div>
-      <div class="d-row"><span class="d-lbl">M3U</span><div class="d-val"><div class="m3u-box"><span class="m3u-link">${m3u}</span><button class="copy-btn" id="cpNew" onclick="copyText('${m3u}',document.getElementById('cpNew'))">📋</button></div></div></div>
-      <div style="margin-top:.85rem"><div style="font-family:var(--fh);font-size:.65rem;letter-spacing:2px;color:var(--gold);margin-bottom:.5rem">WHATSAPP MESSAGE</div>
-      <div class="wa-box">${esc(post)}</div>
-      <button class="btn btn-outline btn-sm" style="margin-top:.55rem" onclick="copyText(${JSON.stringify(post)})">📋 Message Copy</button></div>`;
-    document.getElementById('waBtn').onclick=()=>window.open(`https://wa.me/${phone.replace(/\D/g,'')}?text=${encodeURIComponent(post)}`,'_blank');
-    document.getElementById('nc-name').value='';document.getElementById('nc-phone').value='';
-    openModal('successModal');showToast('✅ Client deploy ho gaya!','success');
-  }catch(e){errEl.textContent='❌ Error: '+e.message;errEl.style.display='block';playSound('error')}
+    const uid=gUID('MITV'),ts=Date.now(),m3u='https://mitv-tan.vercel.app/api/m3u?user='+uid;
+    let src=['https://mitvnet.vercel.app/default.m3u'];
+    try{const ls=await get_(ref_(db,'playlist_library'));if(ls.exists()){src=[];ls.forEach(c=>{if(c.val()?.url)src.push(c.val().url)})}}catch(e){}
+    await set_(ref_(db,'master_users/'+uid),{name:nm,phone:ph,status:'Paid',reseller_id:RID,created_at:ts,updated_at:ts});
+    await set_(ref_(db,'active_playlists/'+uid),{sources:src,warningVideo:'https://mitvnet.vercel.app/mipay.mp4',assigned_by:'Reseller_'+RID,lastUpdate:ts});
+    await set_(ref_(db,'clients/'+RID+'/'+uid),{uid,name:nm,phone:ph,m3u,status:'Paid',time:ts});
+    ps('deploy');
+    const post=waPost(nm,ph,m3u,uid);
+    const waNum=ph.replace(/\D/g,'');
+    document.getElementById('moSB').innerHTML=`
+      <div class="dr"><div class="dl">UID</div><div class="dv mono">${uid}</div></div>
+      <div class="dr"><div class="dl">Name</div><div class="dv">${esc(nm)}</div></div>
+      <div class="dr"><div class="dl">Phone</div><div class="dv">${esc(ph)}</div></div>
+      <div class="dr"><div class="dl">M3U</div><div class="dv">
+        <div class="m3u-box"><span class="m3u-t">${m3u}</span><button class="cp-btn" id="cpNM" onclick="cpTxt('${m3u}',this)">📋</button></div>
+      </div></div>
+      <div style="margin-top:0.75rem">
+        <div class="cost-t" style="margin-bottom:0.4rem">WHATSAPP MESSAGE</div>
+        <div class="wa-box">${esc(post)}</div>
+        <button class="btn bg-ghost bsm bfull" style="margin-top:0.5rem" onclick="cpTxt(${JSON.stringify(post)})">📋 Copy Message</button>
+      </div>`;
+    document.getElementById('waBtn').onclick=()=>window.open('https://wa.me/'+waNum+'?text='+encodeURIComponent(post),'_blank');
+    document.getElementById('nn').value='';document.getElementById('np').value='';
+    oM('moS');toast('✅ Client deployed!','ok');
+  }catch(e){eEl.textContent='❌ '+e.message;eEl.classList.add('on');ps('err')}
   btn.disabled=false;btn.innerHTML='⚡ DEPLOY CLIENT';
-};
+}
 
-// ── CHAT ──────────────────────────────────────────────────────
+// ── CHAT ──
 function initChat(){
   const el=document.getElementById('chatMsgs');
-  onValue(ref(db,`chats/${RID}`),snap=>{
-    const msgs=snap.val()||{};
-    el.innerHTML=!Object.keys(msgs).length?`<div style="text-align:center;padding:3rem;color:var(--text2);font-size:.82rem">Admin (Muaaz) ko message karein 👋</div>`:'';
-    Object.values(msgs).sort((a,b)=>a.ts-b.ts).forEach(m=>{
-      const me=m.from!=='admin';
-      const d=document.createElement('div');d.className=`msg ${me?'me':''}`;
-      d.innerHTML=`<div class="msg-av ${me?'av-user':'av-admin'}">${me?'🧑‍💼':'👑'}</div><div><div class="bubble">${esc(m.text).replace(/\n/g,'<br>')}</div><div class="msg-time">${me?'Me':'Muaaz'} · ${timeAgo(m.ts)}</div></div>`;
+  el.innerHTML='<div style="text-align:center;color:var(--t2);padding:2.5rem;font-size:0.8rem">Admin ko message karo 👋<br><span style="font-size:0.68rem;color:var(--t3)">Realtime Firebase chat</span></div>';
+  onValue_(ref_(db,'chats/'+RID),snap=>{
+    const msgs=[];snap.forEach(c=>msgs.push(c.val()));
+    msgs.sort((a,b)=>a.ts-b.ts);
+    el.innerHTML='';
+    if(!msgs.length){el.innerHTML='<div style="text-align:center;color:var(--t2);padding:2.5rem;font-size:0.8rem">Admin ko message karo 👋</div>';return}
+    msgs.forEach(m=>{
+      const self=m.from!=='admin';
+      const d=document.createElement('div');
+      d.className='msg'+(self?' self':'');
+      d.innerHTML='<div class="mav '+(self?'mav-c':'mav-g')+'">'+(self?'🧑‍💼':'👑')+'</div><div><div class="bubble">'+esc(m.text).replace(/\n/g,'<br>')+'</div><div class="mmeta">'+(self?'Me':'Muaaz')+' · '+tAgo(m.ts)+'</div></div>';
       el.appendChild(d);
     });
     el.scrollTop=el.scrollHeight;
   });
 }
-window.sendMsg=async()=>{const i=document.getElementById('chatIn'),t=i.value.trim();if(!t)return;i.value='';playSound('send');await push(ref(db,`chats/${RID}`),{text:t,from:'reseller',ts:Date.now()})};
-window.chatKey=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg()}};
+async function sChat(){
+  const inp=document.getElementById('chatIn'),txt=inp.value.trim();if(!txt)return;
+  inp.value='';inp.style.height='auto';ps('send');
+  await push_(ref_(db,'chats/'+RID),{text:txt,from:'reseller',ts:Date.now()});
+}
+function ckSend(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sChat()}}
 
-// ── AI ────────────────────────────────────────────────────────
-window.sendAI=async()=>{
-  const inp=document.getElementById('aiIn'),t=inp.value.trim();if(!t)return;inp.value='';
+// ── AI STREAMING ──
+function addAIMsg(text,self){
   const el=document.getElementById('aiMsgs');
-  const add=(txt,role)=>{const d=document.createElement('div');d.className=`msg ${role==='user'?'me':''}`;d.innerHTML=`<div class="msg-av ${role==='user'?'av-user':'av-ai'}">${role==='user'?'🧑‍💼':'🧠'}</div><div><div class="bubble">${esc(txt).replace(/\n/g,'<br>')}</div></div>`;el.appendChild(d);el.scrollTop=el.scrollHeight};
-  add(t,'user');playSound('send');aiHistory.push({role:'user',content:t});
-  const tid='th_'+Date.now(),th=document.createElement('div');
-  th.id=tid;th.className='msg';th.innerHTML=`<div class="msg-av av-ai">🧠</div><div><div class="bubble"><div class="dots"><span></span><span></span><span></span></div></div></div>`;
-  el.appendChild(th);el.scrollTop=el.scrollHeight;
-  const res=await groqChat(aiHistory);
-  document.getElementById(tid)?.remove();
-  aiHistory.push({role:'assistant',content:res});
-  if(aiHistory.length>24)aiHistory=aiHistory.slice(-24);
-  add(res,'ai');playSound('receive');
-};
-window.clearAI=()=>{aiHistory=[];document.getElementById('aiMsgs').innerHTML=`<div class="msg"><div class="msg-av av-ai">🧠</div><div><div class="bubble">Chat clear! Naya sawal poochhein 😊</div></div></div>`};
+  const d=document.createElement('div');
+  d.className='msg'+(self?' self':' ai-m');
+  d.innerHTML='<div class="mav '+(self?'mav-c':'mav-p')+'">'+(self?'🧑‍💼':'🧠')+'</div><div><div class="bubble">'+text.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')+'</div></div>';
+  el.appendChild(d);el.scrollTop=el.scrollHeight;
+  return d.querySelector('.bubble');
+}
 
-// ── NAVIGATION ────────────────────────────────────────────────
-const pages={home:'DASHBOARD',clients:'MY CLIENTS',add:'ADD CLIENT',chat:'ADMIN CHAT',ai:'MI AI',about:'ABOUT'};
-window.goPage=name=>{
-  playSound('nav');
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('pg-'+name)?.classList.add('active');
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('nb-'+name)?.classList.add('active');
-  document.querySelector('.topbar-title').textContent=pages[name]||name.toUpperCase();
-};
+async function sAI(){
+  const inp=document.getElementById('aiIn'),txt=inp.value.trim();if(!txt)return;
+  inp.value='';inp.style.height='auto';ps('send');
+  addAIMsg(esc(txt),true);
+  aiH.push({role:'user',content:txt});
+  if(aiH.length>24)aiH=aiH.slice(-24);
+  const el=document.getElementById('aiMsgs');
+  // Thinking
+  const thD=document.createElement('div');
+  thD.className='msg ai-m';
+  thD.innerHTML='<div class="mav mav-p">🧠</div><div><div class="bubble"><div class="think"><span></span><span></span><span></span></div></div></div>';
+  el.appendChild(thD);el.scrollTop=el.scrollHeight;
 
-// ── MODAL ─────────────────────────────────────────────────────
-window.openModal=openModal; window.closeModal=closeModal;
-window.copyText=copyText;
-document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('show')}));
+  let bubble=null;
+  // Stream
+  for(let a=0;a<GROQ_KEYS.length;a++){
+    const idx=(gKI+a)%GROQ_KEYS.length, key=GROQ_KEYS[idx];
+    if(!key)continue;
+    try{
+      const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+        body:JSON.stringify({
+          model:GROQ_MODEL,stream:true,max_tokens:1024,temperature:0.7,
+          messages:[{role:'system',content:GROQ_SYS},...aiH.slice(-14)]
+        })
+      });
+      if(r.status===429){gKI=(idx+1)%GROQ_KEYS.length;continue}
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      const reader=r.body.getReader(),dec=new TextDecoder();let full='';
+      while(true){
+        const{done,value}=await reader.read();if(done)break;
+        for(const line of dec.decode(value).split('\n')){
+          const t=line.trim();if(!t.startsWith('data:'))continue;
+          const d=t.slice(5).trim();if(d==='[DONE]')continue;
+          try{const j=JSON.parse(d);const ch=j.choices?.[0]?.delta?.content||'';
+            if(ch){
+              full+=ch;
+              if(!bubble){thD.remove();bubble=addAIMsg('');bubble.classList.add('scur')}
+              bubble.innerHTML=full.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')+'<span class="scur" style="display:inline"></span>';
+              el.scrollTop=el.scrollHeight;
+            }
+          }catch(e){}
+        }
+      }
+      gKI=idx;
+      if(!bubble){thD.remove();bubble=addAIMsg(full||'⚠️ No response')}
+      else{bubble.classList.remove('scur');bubble.innerHTML=(full||'⚠️').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}
+      aiH.push({role:'assistant',content:full});ps('recv');
+      break;
+    }catch(e){console.warn('Groq key '+idx+':',e.message);if(a===GROQ_KEYS.length-1){thD.remove();addAIMsg('⚠️ MI AI unavailable. Thodi der baad try karein.')}}
+  }
+}
+function clrAI(){aiH=[];document.getElementById('aiMsgs').innerHTML='';addAIMsg('Chat clear! Naya sawal poochho 😊')}
+function akSend(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sAI()}}
 
-// ── LOGOUT ────────────────────────────────────────────────────
-window.logout=()=>{playSound('logout');localStorage.removeItem('mitv_session');sessionStorage.removeItem('mitv_reseller');location.href='index.html'};
+// ── NAVIGATION ──
+function gp(name){
+  ps('nav');
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.bni').forEach(b=>b.classList.remove('on'));
+  document.getElementById('pg-'+name)?.classList.add('on');
+  document.querySelector('.bni[data-pg="'+name+'"]')?.classList.add('on');
+  // Scroll to top smoothly
+  const sc=document.getElementById('scrl');
+  if(sc)sc.scrollTo({top:0,behavior:'smooth'});
+}
+// Expose for HTML onclick
+window.gp=gp;
+
+// ── PWA ──
+let pwaPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();pwaPrompt=e;
+  const b=document.getElementById('pwaBanner');
+  if(b)setTimeout(()=>b.style.transform='translateX(-50%) translateY(0)',2500);
+});
+window.addEventListener('appinstalled',()=>{
+  document.getElementById('pwaOk').style.display='block';
+  document.getElementById('pwaBtn').style.display='none';
+});
+function doInstall(){
+  if(pwaPrompt){pwaPrompt.prompt();pwaPrompt.userChoice.then(r=>{if(r.outcome==='accepted')toast('✅ App install ho gaya!','ok');pwaPrompt=null})}
+  else{document.getElementById('pwaOk').style.display='block';document.getElementById('pwaBtn').style.display='none'}
+}
+
+// ── LOGOUT ──
+function doLogout(){ps('err');localStorage.removeItem('mitv_s');sessionStorage.removeItem('ms');location.replace('index.html')}
+
+// ── EXPOSE GLOBALS ──
+window.cpTxt=cpTxt;window.oM=oM;window.cM=cM;window.doInstall=doInstall;window.doLogout=doLogout;
+window.openDet=openDet;window.togCli=togCli;window.delCli=delCli;window.addCli=addCli;
+window.sChat=sChat;window.ckSend=ckSend;window.sAI=sAI;window.clrAI=clrAI;window.akSend=akSend;
+window.arSz=arSz;window.fC=fC;window.tglSnd=tglSnd;
+
+// ── START ──
+if(!savedPIN){initApp()}else{setTimeout(()=>{},0)}
+// Loader fallback
+window.addEventListener('load',()=>setTimeout(()=>document.getElementById('ldr').classList.add('hide'),500));
 </script>
 </body>
 </html>
