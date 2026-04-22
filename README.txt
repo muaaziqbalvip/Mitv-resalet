@@ -1,121 +1,108 @@
 ====================================================================
-  MITV NETWORK PORTAL v6.0 — ULTRA SMOOTH PWA
+  MITV NETWORK PORTAL v7.0 — FULL CONTROL
   Project: MUSLIM ISLAM | Muaaz Iqbal (Kasur, Punjab, Pakistan)
 ====================================================================
 
 FILES:
-  index.html      — Login + Register (Google Sign-In support)
-  dashboard.html  — Reseller App (6-tab bottom nav)
-  admin.html      — Admin Panel (6-tab + Google Login)
-  manifest.json   — PWA App Manifest
+  index.html      — Login + Register + Google Sign-In
+  dashboard.html  — Reseller App (6 tabs)
+  admin.html      — Admin Panel (6 tabs) — FULL CONTROL
+  manifest.json   — PWA
   sw.js           — Service Worker (Offline)
   robots.txt      — SEO
-  README.txt      — Yeh file
 
 ====================================================================
 SETUP — 2 STEPS
 ====================================================================
 
-STEP 1: FIREBASE CONFIG
-─────────────────────────
-Teen files mein "YOUR_FIREBASE_API_KEY" replace karo:
+STEP 1: Firebase Config (3 jagah replace karein):
   index.html, dashboard.html, admin.html
+  Search: "YOUR_FIREBASE_API_KEY"
+  Replace with apna actual Firebase config
 
-  apiKey:            "YOUR_FIREBASE_API_KEY"
-  messagingSenderId: "YOUR_SENDER_ID"
-  appId:             "YOUR_APP_ID"
+STEP 2: Vercel Deploy
+  vercel.com → New Project → Upload folder → Done!
 
-Firebase Console: console.firebase.google.com
-  → Project: ramadan-2385b
-  → Settings → General → Your Apps → Web → Config
+FIREBASE AUTH (Google Login ke liye):
+  Firebase Console → Authentication → Google → Enable
+  Authorized domains mein Vercel URL add karein
 
-FIREBASE AUTH SETUP (Google Login ke liye):
-  → Authentication → Sign-in method → Google → Enable
-  → Authorized domains mein apna Vercel URL add karo
-
-FIREBASE STORAGE RULES (image/voice upload ke liye):
+FIREBASE STORAGE RULES (image upload):
   rules_version = '2';
   service firebase.storage {
     match /b/{bucket}/o {
-      match /{allPaths=**} {
-        allow read, write: if true;
-      }
+      match /{allPaths=**} { allow read, write: if true; }
     }
   }
 
-STEP 2: VERCEL DEPLOY
-──────────────────────
-  1. vercel.com par account banao
-  2. New Project → Upload karo sara folder
-  3. Live URL milega instantly
-  4. Done! 🎉
-
 ====================================================================
-NEW FEATURES v6.0
+v7.0 NEW FEATURES
 ====================================================================
 
-✅ 5 BEAUTIFUL THEMES:
-   • Dark Gold (default)   — Classic MITV look
-   • Royal Purple          — Premium vibes
-   • Deep Ocean            — Cool blue
-   • Rose Fire             — Hot red/orange
-   • Forest Green          — Fresh green
-   Theme login se hi remember hoti hai localStorage se
+✅ CHAT SYSTEM — FULLY REBUILT:
+  • Admin → Reseller: Admin ke saath real-time chat
+  • Reseller → Reseller (R2R): "Resellers" tab se doosre
+    resellers ke saath bhi chat — WhatsApp style
+  • IMAGE SEND: 🖼️ button se photo send
+  • MESSAGE EDIT: Admin kisi bhi message ko edit kar sakta hai
+  • MESSAGE DELETE: Admin koi bhi message delete kar sakta hai
+  • EDITED tag message pe show hota hai
+  • Chat badge (unread count) bottom nav pe
+  • Voice support: Admin panel mein voice messages
+  • Smooth animations, no lag, no errors
 
-✅ GOOGLE LOGIN (Admin):
-   • muaaziqbal@gmail.com se direct Google login
-   • PIN bhi kaam karta hai as backup
-   • Firebase Auth integration
+✅ ADMIN FULL CONTROL:
+  • Har reseller ki POORI detail: Name, Phone, PASSWORD,
+    Email, City, ID, Credits, Client List, Revenue
+  • Reseller editing: Sab kuch edit — naam, phone, email,
+    city, password, credits, status (active/block)
+  • Client list per reseller ke detail mein (6 dikhte hain)
+  • Revenue calculation per reseller
+  • Chat mein har message edit/delete karo
+  • Google Login: muaaziqbal@gmail.com se direct access
+  • PIN change settings mein
+  • Theme change settings mein
 
-✅ ADMIN PANEL UPGRADES:
-   • Full reseller detail: Name, Phone, Password, Email, City, Credits
-   • Reseller editing (naam, phone, email, city, password, credits)
-   • M3U link per reseller detail mein
-   • Client list per reseller detail mein
-   • Top Resellers monitoring page
-   • Live stats with progress bars
-   • Image send in chat (Firebase Storage)
-   • Voice messages in chat (MediaRecorder API)
-   • Reseller search filter
-   • Settings: PIN change + Theme
+✅ CLIENT DEEP EDITING (Dashboard):
+  • Client ka naam edit
+  • Phone number edit
+  • Notes edit
+  • Status change (Paid/Blocked)
+  • Yeh sab clients mein "✏️ Edit" button se
 
-✅ RESELLER DASHBOARD UPGRADES:
-   • Email add karna profile se
-   • Profile edit (email + password)
-   • Client filter tabs: All / Paid / Block
-   • Notes field per client
-   • Credits display
-   • Image send in chat
-   • Theme switcher in profile tab
-   • Better M3U copy buttons
+✅ PROFILE EDIT (Dashboard):
+  • Email add/update
+  • Password change
+  • App PIN change
+  • Sab ek modal mein
 
-✅ AI IMPROVEMENTS:
-   • Groq llama-3.3-70b-versatile (latest)
-   • Streaming with animated cursor
-   • 14-message conversation history
-   • Admin-aware system prompt
+✅ CLIENT TRACKING / ACTIVITY LOG:
+  • Har add/delete/edit ka record Firebase mein
+  • Activity log Home page pe dikhta hai
+  • Client add hone pe log: "New client: NAME (UID)"
+  • Delete pe: "Client deleted: NAME"
+  • Status change pe: "Status: PAID/BLOCKED"
 
-✅ PERFORMANCE:
-   • GPU-only animations (transform, opacity)
-   • Firebase ES modules (no conflicts)
-   • Lazy imports
-   • PWA offline support
+✅ PERFORMANCE SCORE:
+  • Paid rate % dikhai deta hai
+  • Progress bar with color
+  • "Excellent / Acha / Aur clients add karo!" labels
+
+✅ 5 THEMES:
+  Dark Gold | Royal Purple | Deep Ocean | Rose Fire | Forest
 
 ====================================================================
-ADMIN LOGIN OPTIONS:
-  1. PIN: 1234 (changeable in Settings ⚙️)
-  2. Google: muaaziqbal@gmail.com
-
 FIREBASE NODES:
-  /resellers/{RES-ID}         — Reseller accounts
-  /reseller_requests/{id}     — Join requests
-  /clients/{RES-ID}/{UID}     — Client data
-  /master_users/{UID}         — Master user list
-  /active_playlists/{UID}     — M3U engine
-  /playlist_library/{id}      — Global M3U sources
-  /chats/{RES-ID}/{msg-id}    — Chat messages
+  /resellers/{RES-ID}       — Reseller accounts (full data)
+  /reseller_requests/{id}   — Join requests
+  /clients/{RES-ID}/{UID}   — Client data
+  /master_users/{UID}       — Master client list
+  /active_playlists/{UID}   — M3U sources
+  /chats/{RES-ID}/{msg-id}  — Admin-Reseller chat
+  /r2r_chats/{ID1_ID2}/{}   — Reseller-to-Reseller chat
+  /activity/{RES-ID}/{}     — Activity tracking log
 
 ====================================================================
 MUAAZ IQBAL — KASUR, PUNJAB, PAKISTAN
-MUSLIM ISLAM — MiTV Network v6.0
+MUSLIM ISLAM — MiTV Network v7.0
 ====================================================================
