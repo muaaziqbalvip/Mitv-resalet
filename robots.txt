@@ -1,6 +1,3 @@
 User-agent: *
 Allow: /
 Sitemap: https://mitvnetwork.vercel.app/sitemap.xml
-
-# MITV Network — by MUSLIM ISLAM
-# Founder: Muaaz Iqbal (Kasur, Punjab, Pakistan)
